@@ -293,6 +293,58 @@ export function MockSchedulerPreview({ initialDraftId }: MockSchedulerPreviewPro
     )
   }
 
+  // Obtiene la materia y detalles de colisión de celdas para rowSpan
+  const getCellSpanInfo = (day: number, blockIndex: number) => {
+    for (const sub of mySchedule) {
+      for (const slot of sub.slots) {
+        if (slot.day !== day) continue
+
+        const startTime = slot.startTime || slot.timeLabel.split(" - ")[0]
+        const endTime = slot.endTime || slot.timeLabel.split(" - ")[1]
+        if (!startTime || !endTime) continue
+
+        const [sHStart, sMStart] = startTime.split(":").map(Number)
+        const [sHEnd, sMEnd] = endTime.split(":").map(Number)
+        const sStart = sHStart * 60 + sMStart
+        const sEnd = sHEnd * 60 + sMEnd
+
+        // Determinar qué bloques de la tabla se cruzan con este slot
+        const intersectedIndices: number[] = []
+        for (const b of TIME_BLOCKS) {
+          const [bHStart, bMStart] = b.startTime.split(":").map(Number)
+          const [bHEnd, bMEnd] = b.endTime.split(":").map(Number)
+          const bStart = bHStart * 60 + bMStart
+          const bEnd = bHEnd * 60 + bMEnd
+
+          if (bStart < sEnd && sStart < bEnd) {
+            intersectedIndices.push(b.index)
+          }
+        }
+
+        // Si el bloque actual se cruza con este slot
+        if (intersectedIndices.includes(blockIndex)) {
+          const minIndex = Math.min(...intersectedIndices)
+          const isStart = blockIndex === minIndex
+          return {
+            subject: sub,
+            slot,
+            isStart,
+            rowSpan: intersectedIndices.length,
+            shouldRender: isStart
+          }
+        }
+      }
+    }
+
+    return {
+      subject: null,
+      slot: null,
+      isStart: false,
+      rowSpan: 1,
+      shouldRender: true
+    }
+  }
+
   // Save draft schedule
   const handleSaveDraft = async () => {
     if (!user) {
@@ -433,26 +485,28 @@ export function MockSchedulerPreview({ initialDraftId }: MockSchedulerPreviewPro
                     {block.label}
                   </td>
                   {DAYS.map((day) => {
-                    const subject = getPersonalSlotContent(day.value, block.index)
-                    
-                    // Buscar el aula y la etiqueta de hora específicos para este bloque en el canvas
-                    const currentSlot = subject?.slots?.find(s => s.day === day.value && s.blockIndex === block.index)
-                    const room = currentSlot?.roomName || "Sin Aula"
-                    const timeLabel = currentSlot?.timeLabel || ""
+                    const spanInfo = getCellSpanInfo(day.value, block.index)
+                    if (!spanInfo.shouldRender) return null
+
+                    const subject = spanInfo.subject
+                    const room = spanInfo.slot?.roomName || "Sin Aula"
+                    const timeLabel = spanInfo.slot?.timeLabel || ""
                     const isEarlyBlock = block.index < 3
 
                     return (
                       <td
                         key={day.value}
+                        rowSpan={spanInfo.rowSpan}
                         className={cn(
-                          "p-1 border-r border-border last:border-0 h-16 w-32 transition-all relative group",
-                          subject ? "bg-background" : "bg-muted/5 hover:bg-muted/10"
+                          "p-1 border-r border-border last:border-0 transition-all relative group",
+                          subject ? "bg-background" : "bg-muted/5 hover:bg-muted/10 h-16 w-32"
                         )}
+                        style={subject ? { height: `${spanInfo.rowSpan * 4.25}rem` } : undefined}
                       >
                         {subject ? (
                           <div
                             className={cn(
-                              "h-full w-full p-1.5 border text-[10px]/tight font-medium flex flex-col justify-between overflow-hidden shadow-xs",
+                              "h-full w-full p-1.5 border text-[10px]/tight font-medium flex flex-col justify-between overflow-hidden shadow-xs rounded-lg",
                               subject.color
                             )}
                           >
