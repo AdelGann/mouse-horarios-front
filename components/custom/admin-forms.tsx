@@ -41,7 +41,7 @@ export function AddDeaneryForm({ onSave, onClose }: { onSave: (name: string) => 
           className={formik.touched.name && formik.errors.name ? "border-destructive focus-visible:ring-destructive" : ""}
         />
         {formik.touched.name && formik.errors.name && (
-          <span className="text-[10px] text-destructive font-medium">{formik.errors.name}</span>
+          <span className="text-[10px] text-destructive font-medium">{formik.errors.name as React.ReactNode}</span>
         )}
       </div>
       <Button type="submit" className="w-full cursor-pointer mt-3" disabled={formik.isSubmitting}>
@@ -74,7 +74,7 @@ export function EditDeaneryForm({ item, onSave, onClose }: { item: any; onSave: 
           className={formik.touched.name && formik.errors.name ? "border-destructive focus-visible:ring-destructive" : ""}
         />
         {formik.touched.name && formik.errors.name && (
-          <span className="text-[10px] text-destructive font-medium">{formik.errors.name}</span>
+          <span className="text-[10px] text-destructive font-medium">{formik.errors.name as React.ReactNode}</span>
         )}
       </div>
       <Button type="submit" className="w-full cursor-pointer mt-3" disabled={formik.isSubmitting}>
@@ -119,7 +119,7 @@ export function AddCareerForm({ deaneries, onSave, onClose }: { deaneries: any[]
           className={formik.touched.name && formik.errors.name ? "border-destructive focus-visible:ring-destructive" : ""}
         />
         {formik.touched.name && formik.errors.name && (
-          <span className="text-[10px] text-destructive font-medium">{formik.errors.name}</span>
+          <span className="text-[10px] text-destructive font-medium">{formik.errors.name as React.ReactNode}</span>
         )}
       </div>
       <div className="flex flex-col gap-1.5">
@@ -134,7 +134,7 @@ export function AddCareerForm({ deaneries, onSave, onClose }: { deaneries: any[]
           {deaneries.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
         </Select>
         {formik.touched.deaneryId && formik.errors.deaneryId && (
-          <span className="text-[10px] text-destructive font-medium">{formik.errors.deaneryId}</span>
+          <span className="text-[10px] text-destructive font-medium">{formik.errors.deaneryId as React.ReactNode}</span>
         )}
       </div>
       <Button type="submit" className="w-full cursor-pointer mt-3" disabled={formik.isSubmitting}>
@@ -167,7 +167,7 @@ export function EditCareerForm({ item, deaneries, onSave, onClose }: { item: any
           className={formik.touched.name && formik.errors.name ? "border-destructive focus-visible:ring-destructive" : ""}
         />
         {formik.touched.name && formik.errors.name && (
-          <span className="text-[10px] text-destructive font-medium">{formik.errors.name}</span>
+          <span className="text-[10px] text-destructive font-medium">{formik.errors.name as React.ReactNode}</span>
         )}
       </div>
       <div className="flex flex-col gap-1.5">
@@ -182,7 +182,7 @@ export function EditCareerForm({ item, deaneries, onSave, onClose }: { item: any
           {deaneries.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
         </Select>
         {formik.touched.deaneryId && formik.errors.deaneryId && (
-          <span className="text-[10px] text-destructive font-medium">{formik.errors.deaneryId}</span>
+          <span className="text-[10px] text-destructive font-medium">{formik.errors.deaneryId as React.ReactNode}</span>
         )}
       </div>
       <Button type="submit" className="w-full cursor-pointer mt-3" disabled={formik.isSubmitting}>
@@ -228,7 +228,7 @@ export function AddNoticeForm({ onSave, onClose }: { onSave: (data: { title: str
           className={formik.touched.title && formik.errors.title ? "border-destructive focus-visible:ring-destructive" : ""}
         />
         {formik.touched.title && formik.errors.title && (
-          <span className="text-[10px] text-destructive font-medium">{formik.errors.title}</span>
+          <span className="text-[10px] text-destructive font-medium">{formik.errors.title as React.ReactNode}</span>
         )}
       </div>
       <div className="flex flex-col gap-1.5">
@@ -246,7 +246,7 @@ export function AddNoticeForm({ onSave, onClose }: { onSave: (data: { title: str
           }`}
         />
         {formik.touched.content && formik.errors.content && (
-          <span className="text-[10px] text-destructive font-medium">{formik.errors.content}</span>
+          <span className="text-[10px] text-destructive font-medium">{formik.errors.content as React.ReactNode}</span>
         )}
       </div>
       <Button type="submit" className="w-full cursor-pointer mt-3" disabled={formik.isSubmitting}>
@@ -279,7 +279,7 @@ export function EditNoticeForm({ item, onSave, onClose }: { item: any; onSave: (
           className={formik.touched.title && formik.errors.title ? "border-destructive focus-visible:ring-destructive" : ""}
         />
         {formik.touched.title && formik.errors.title && (
-          <span className="text-[10px] text-destructive font-medium">{formik.errors.title}</span>
+          <span className="text-[10px] text-destructive font-medium">{formik.errors.title as React.ReactNode}</span>
         )}
       </div>
       <div className="flex flex-col gap-1.5">
@@ -296,7 +296,7 @@ export function EditNoticeForm({ item, onSave, onClose }: { item: any; onSave: (
           }`}
         />
         {formik.touched.content && formik.errors.content && (
-          <span className="text-[10px] text-destructive font-medium">{formik.errors.content}</span>
+          <span className="text-[10px] text-destructive font-medium">{formik.errors.content as React.ReactNode}</span>
         )}
       </div>
       <Button type="submit" className="w-full cursor-pointer mt-3" disabled={formik.isSubmitting}>
@@ -345,7 +345,7 @@ export function AddCourseForm({ careers, onSave, onClose }: { careers: any[]; on
           className={formik.touched.name && formik.errors.name ? "border-destructive focus-visible:ring-destructive" : ""}
         />
         {formik.touched.name && formik.errors.name && (
-          <span className="text-[10px] text-destructive font-medium">{formik.errors.name}</span>
+          <span className="text-[10px] text-destructive font-medium">{formik.errors.name as React.ReactNode}</span>
         )}
       </div>
       <div className="flex flex-col gap-1.5">
@@ -362,7 +362,7 @@ export function AddCourseForm({ careers, onSave, onClose }: { careers: any[]; on
           ))}
         </Select>
         {formik.touched.semester && formik.errors.semester && (
-          <span className="text-[10px] text-destructive font-medium">{formik.errors.semester}</span>
+          <span className="text-[10px] text-destructive font-medium">{formik.errors.semester as React.ReactNode}</span>
         )}
       </div>
       <div className="flex flex-col gap-1.5">
@@ -377,7 +377,7 @@ export function AddCourseForm({ careers, onSave, onClose }: { careers: any[]; on
           {careers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
         </Select>
         {formik.touched.careerId && formik.errors.careerId && (
-          <span className="text-[10px] text-destructive font-medium">{formik.errors.careerId}</span>
+          <span className="text-[10px] text-destructive font-medium">{formik.errors.careerId as React.ReactNode}</span>
         )}
       </div>
       <Button type="submit" className="w-full cursor-pointer mt-3" disabled={formik.isSubmitting}>
@@ -410,7 +410,7 @@ export function EditCourseForm({ item, careers, onSave, onClose }: { item: any; 
           className={formik.touched.name && formik.errors.name ? "border-destructive focus-visible:ring-destructive" : ""}
         />
         {formik.touched.name && formik.errors.name && (
-          <span className="text-[10px] text-destructive font-medium">{formik.errors.name}</span>
+          <span className="text-[10px] text-destructive font-medium">{formik.errors.name as React.ReactNode}</span>
         )}
       </div>
       <div className="flex flex-col gap-1.5">
@@ -427,7 +427,7 @@ export function EditCourseForm({ item, careers, onSave, onClose }: { item: any; 
           ))}
         </Select>
         {formik.touched.semester && formik.errors.semester && (
-          <span className="text-[10px] text-destructive font-medium">{formik.errors.semester}</span>
+          <span className="text-[10px] text-destructive font-medium">{formik.errors.semester as React.ReactNode}</span>
         )}
       </div>
       <div className="flex flex-col gap-1.5">
@@ -442,7 +442,7 @@ export function EditCourseForm({ item, careers, onSave, onClose }: { item: any; 
           {careers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
         </Select>
         {formik.touched.careerId && formik.errors.careerId && (
-          <span className="text-[10px] text-destructive font-medium">{formik.errors.careerId}</span>
+          <span className="text-[10px] text-destructive font-medium">{formik.errors.careerId as React.ReactNode}</span>
         )}
       </div>
       <Button type="submit" className="w-full cursor-pointer mt-3" disabled={formik.isSubmitting}>
@@ -485,7 +485,7 @@ export function AddTeacherForm({ onSave, onClose }: { onSave: (name: string) => 
           className={formik.touched.name && formik.errors.name ? "border-destructive focus-visible:ring-destructive" : ""}
         />
         {formik.touched.name && formik.errors.name && (
-          <span className="text-[10px] text-destructive font-medium">{formik.errors.name}</span>
+          <span className="text-[10px] text-destructive font-medium">{formik.errors.name as React.ReactNode}</span>
         )}
       </div>
       <Button type="submit" className="w-full cursor-pointer mt-3" disabled={formik.isSubmitting}>
@@ -518,7 +518,7 @@ export function EditTeacherForm({ item, onSave, onClose }: { item: any; onSave: 
           className={formik.touched.name && formik.errors.name ? "border-destructive focus-visible:ring-destructive" : ""}
         />
         {formik.touched.name && formik.errors.name && (
-          <span className="text-[10px] text-destructive font-medium">{formik.errors.name}</span>
+          <span className="text-[10px] text-destructive font-medium">{formik.errors.name as React.ReactNode}</span>
         )}
       </div>
       <Button type="submit" className="w-full cursor-pointer mt-3" disabled={formik.isSubmitting}>
@@ -561,7 +561,7 @@ export function AddSectionForm({ onSave, onClose }: { onSave: (name: string) => 
           className={formik.touched.name && formik.errors.name ? "border-destructive focus-visible:ring-destructive" : ""}
         />
         {formik.touched.name && formik.errors.name && (
-          <span className="text-[10px] text-destructive font-medium">{formik.errors.name}</span>
+          <span className="text-[10px] text-destructive font-medium">{formik.errors.name as React.ReactNode}</span>
         )}
       </div>
       <Button type="submit" className="w-full cursor-pointer mt-3" disabled={formik.isSubmitting}>
@@ -594,7 +594,7 @@ export function EditSectionForm({ item, onSave, onClose }: { item: any; onSave: 
           className={formik.touched.name && formik.errors.name ? "border-destructive focus-visible:ring-destructive" : ""}
         />
         {formik.touched.name && formik.errors.name && (
-          <span className="text-[10px] text-destructive font-medium">{formik.errors.name}</span>
+          <span className="text-[10px] text-destructive font-medium">{formik.errors.name as React.ReactNode}</span>
         )}
       </div>
       <Button type="submit" className="w-full cursor-pointer mt-3" disabled={formik.isSubmitting}>
@@ -640,7 +640,7 @@ export function AddRoomForm({ onSave, onClose }: { onSave: (data: { name: string
           className={formik.touched.name && formik.errors.name ? "border-destructive focus-visible:ring-destructive" : ""}
         />
         {formik.touched.name && formik.errors.name && (
-          <span className="text-[10px] text-destructive font-medium">{formik.errors.name}</span>
+          <span className="text-[10px] text-destructive font-medium">{formik.errors.name as React.ReactNode}</span>
         )}
       </div>
       <div className="flex flex-col gap-1.5">
@@ -656,7 +656,7 @@ export function AddRoomForm({ onSave, onClose }: { onSave: (data: { name: string
           className={formik.touched.capacity && formik.errors.capacity ? "border-destructive focus-visible:ring-destructive" : ""}
         />
         {formik.touched.capacity && formik.errors.capacity && (
-          <span className="text-[10px] text-destructive font-medium">{formik.errors.capacity}</span>
+          <span className="text-[10px] text-destructive font-medium">{formik.errors.capacity as React.ReactNode}</span>
         )}
       </div>
       <Button type="submit" className="w-full cursor-pointer mt-3" disabled={formik.isSubmitting}>
@@ -689,7 +689,7 @@ export function EditRoomForm({ item, onSave, onClose }: { item: any; onSave: (id
           className={formik.touched.name && formik.errors.name ? "border-destructive focus-visible:ring-destructive" : ""}
         />
         {formik.touched.name && formik.errors.name && (
-          <span className="text-[10px] text-destructive font-medium">{formik.errors.name}</span>
+          <span className="text-[10px] text-destructive font-medium">{formik.errors.name as React.ReactNode}</span>
         )}
       </div>
       <div className="flex flex-col gap-1.5">
@@ -704,7 +704,7 @@ export function EditRoomForm({ item, onSave, onClose }: { item: any; onSave: (id
           className={formik.touched.capacity && formik.errors.capacity ? "border-destructive focus-visible:ring-destructive" : ""}
         />
         {formik.touched.capacity && formik.errors.capacity && (
-          <span className="text-[10px] text-destructive font-medium">{formik.errors.capacity}</span>
+          <span className="text-[10px] text-destructive font-medium">{formik.errors.capacity as React.ReactNode}</span>
         )}
       </div>
       <Button type="submit" className="w-full cursor-pointer mt-3" disabled={formik.isSubmitting}>
