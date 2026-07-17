@@ -62,9 +62,9 @@ function GlobalScheduleEditForm({
             startTime: slot.startTime,
             endTime: slot.endTime,
             roomId: slot.room?.id || ""
-          })) || [{ dayOfWeek: 1, startTime: "07:00", endTime: "08:30", roomId: "" }]
+          })) || [{ dayOfWeek: 1, startTime: "08:00", endTime: "08:45", roomId: "" }]
         }))
-      : [{ courseId: "", teacherId: "", slots: [{ dayOfWeek: 1, startTime: "07:00", endTime: "08:30", roomId: "" }] }]
+      : [{ courseId: "", teacherId: "", slots: [{ dayOfWeek: 1, startTime: "08:00", endTime: "08:45", roomId: "" }] }]
   )
   const [saving, setSaving] = React.useState(false)
 
@@ -136,7 +136,7 @@ function GlobalScheduleEditForm({
           <Button type="button" variant="outline" size="xs" className="gap-1 cursor-pointer"
             onClick={() => setEditSubjects(prev => [...prev, {
               courseId: "", teacherId: "",
-              slots: [{ dayOfWeek: 1, startTime: "07:00", endTime: "08:30", roomId: "" }]
+              slots: [{ dayOfWeek: 1, startTime: "08:00", endTime: "08:45", roomId: "" }]
             }])}>
             <Plus className="size-3" /> Agregar
           </Button>
@@ -211,7 +211,7 @@ function GlobalScheduleEditForm({
             ))}
             <Button type="button" variant="ghost" size="xs" className="text-[10px] h-6 px-2 cursor-pointer"
               onClick={() => setEditSubjects(prev => prev.map((s, i) => i === si
-                ? { ...s, slots: [...s.slots, { dayOfWeek: 1, startTime: "07:00", endTime: "08:30", roomId: "" }] }
+                ? { ...s, slots: [...s.slots, { dayOfWeek: 1, startTime: "08:00", endTime: "08:45", roomId: "" }] }
                 : s))}>
               + Bloque de hora
             </Button>
@@ -275,7 +275,7 @@ export default function AdminPage() {
   const [schedCareerId, setSchedCareerId] = React.useState("")
   const [schedSemester, setSchedSemester] = React.useState("1")
   const [schedSubjects, setSchedSubjects] = React.useState<any[]>([
-    { courseId: "", teacherId: "", slots: [{ dayOfWeek: 1, startTime: "07:00", endTime: "08:30", roomId: "" }] }
+    { courseId: "", teacherId: "", slots: [{ dayOfWeek: 1, startTime: "08:00", endTime: "08:45", roomId: "" }] }
   ])
 
   // Fetch initial setup
@@ -512,7 +512,7 @@ export default function AdminPage() {
   const addSubjectRow = () => {
     setSchedSubjects(prev => [
       ...prev,
-      { courseId: "", teacherId: "", slots: [{ dayOfWeek: 1, startTime: "07:00", endTime: "08:30", roomId: "" }] }
+      { courseId: "", teacherId: "", slots: [{ dayOfWeek: 1, startTime: "08:00", endTime: "08:45", roomId: "" }] }
     ])
   }
 
@@ -529,7 +529,7 @@ export default function AdminPage() {
       if (i === subIdx) {
         return {
           ...item,
-          slots: [...item.slots, { dayOfWeek: 1, startTime: "07:00", endTime: "08:30", roomId: "" }]
+          slots: [...item.slots, { dayOfWeek: 1, startTime: "08:00", endTime: "08:45", roomId: "" }]
         }
       }
       return item
@@ -577,7 +577,7 @@ export default function AdminPage() {
       })
       toast.success("Horario global guardado con éxito")
       setSchedSubjects([
-        { courseId: "", teacherId: "", slots: [{ dayOfWeek: 1, startTime: "07:00", endTime: "08:30", roomId: "" }] }
+        { courseId: "", teacherId: "", slots: [{ dayOfWeek: 1, startTime: "08:00", endTime: "08:45", roomId: "" }] }
       ])
       fetchData()
     } catch (e: any) {

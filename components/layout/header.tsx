@@ -2,11 +2,15 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { User, LogOut, Palette } from "lucide-react"
+import { User, LogOut, Palette, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeCustomizerDialog } from "@/components/custom/theme-customizer-dialog"
 
-export function Header() {
+interface HeaderProps {
+  onMenuClick?: () => void
+}
+
+export function Header({ onMenuClick }: HeaderProps) {
   const router = useRouter()
   const [customizerOpen, setCustomizerOpen] = React.useState(false)
   const [user, setUser] = React.useState<{
@@ -50,6 +54,17 @@ export function Header() {
     <header className="h-14 border-b border-border bg-card/45 backdrop-blur-xs flex items-center justify-between px-6 shrink-0 relative z-20 font-sans">
       {/* Left side: Breadcrumb info */}
       <div className="flex items-center gap-2 text-xs">
+        {onMenuClick && (
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            onClick={onMenuClick}
+            className="md:hidden mr-1 text-muted-foreground hover:text-foreground cursor-pointer"
+            title="Abrir menú"
+          >
+            <Menu className="size-4.5" />
+          </Button>
+        )}
         <span className="text-muted-foreground font-medium">UCLA DCYT</span>
         <span className="text-muted-foreground/40">/</span>
         <span className="text-foreground font-semibold uppercase tracking-wider text-[10px]">

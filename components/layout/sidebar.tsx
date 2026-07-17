@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { 
   Home, 
   Calendar, 
@@ -13,7 +13,8 @@ import {
   ChevronRight, 
   MousePointerClick,
   HelpCircle,
-  ShieldCheck
+  ShieldCheck,
+  X
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -63,13 +64,36 @@ const NAVIGATION_OPTIONS: SidebarOption[] = [
   }
 ]
 
-export function Sidebar() {
+interface SidebarProps {
+  isOpen?: boolean
+  onClose?: () => void
+}
+
+export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname()
+  const router = useRouter()
   const [user, setUser] = React.useState<any>(null)
   const [expandedMenus, setExpandedMenus] = React.useState<Record<string, boolean>>({
     Configuración: false,
     Administración: false,
   })
+
+  // Handle clean navigation for suboptions, preventing hash stacking issues (e.g. /admin#horarios#materias)
+  const handleSubOptionClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.includes("#")) {
+      e.preventDefault()
+      const [path, hash] = href.split("#")
+
+      if (pathname === path) {
+        window.location.hash = hash
+      } else {
+        router.push(href)
+      }
+    }
+    if (onClose) {
+      onClose()
+    }
+  }
 
   React.useEffect(() => {
     try {
@@ -121,21 +145,45 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="w-64 border-r border-border bg-sidebar text-sidebar-foreground flex flex-col h-screen sticky top-0 shrink-0 font-sans overflow-hidden">
-      {/* Brand logo header */}
-      <div className="h-14 border-b border-border flex items-center px-4 gap-2.5 bg-sidebar">
-        <div className="flex h-7 w-7 items-center justify-center bg-sidebar-primary text-sidebar-primary-foreground rounded-lg">
-          <MousePointerClick className="size-4" />
+    <>
+      {/* Backdrop overlay for mobile drawer */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs md:hidden cursor-pointer"
+          onClick={onClose}
+        />
+      )}
+
+      <aside className={cn(
+        "w-64 border-r border-border bg-sidebar text-sidebar-foreground flex flex-col h-screen shrink-0 font-sans overflow-hidden transition-transform duration-300 ease-in-out z-50",
+        "fixed inset-y-0 left-0 md:sticky md:translate-x-0",
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        {/* Brand logo header */}
+        <div className="h-14 border-b border-border flex items-center justify-between px-4 bg-sidebar">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-7 w-7 items-center justify-center bg-sidebar-primary text-sidebar-primary-foreground rounded-lg">
+              <MousePointerClick className="size-4" />
+            </div>
+            <div className="flex flex-col">
+              <span className="font-heading text-xs font-bold uppercase tracking-wider text-foreground">
+                Mi<span className="text-muted-foreground font-light">Horario</span>
+              </span>
+              <span className="text-[8px] text-muted-foreground uppercase tracking-widest -mt-0.5">
+                {user?.role === "ADMIN" ? "Panel Administrativo" : "Panel Estudiantil"}
+              </span>
+            </div>
+          </div>
+          {onClose && (
+            <button 
+              onClick={onClose}
+              className="md:hidden p-1 rounded-lg hover:bg-sidebar-accent/50 text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+              title="Cerrar menú"
+            >
+              <X className="size-4" />
+            </button>
+          )}
         </div>
-        <div className="flex flex-col">
-          <span className="font-heading text-xs font-bold uppercase tracking-wider text-foreground">
-            Mi<span className="text-muted-foreground font-light">Horario</span>
-          </span>
-          <span className="text-[8px] text-muted-foreground uppercase tracking-widest -mt-0.5">
-            {user?.role === "ADMIN" ? "Panel Administrativo" : "Panel Estudiantil"}
-          </span>
-        </div>
-      </div>
 
       {/* Nav List */}
       <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto scrollbar-thin">
@@ -196,6 +244,7 @@ export function Sidebar() {
                       <Link
                         key={sub.name}
                         href={sub.href}
+                        onClick={(e) => handleSubOptionClick(e, sub.href)}
                         className={cn(
                           "py-1 px-2 text-[11px] rounded-md transition-colors",
                           isSubActive
@@ -223,5 +272,6 @@ export function Sidebar() {
         <span>Usuario: {user?.fullname || user?.username || "Invitado"}</span>
       </div>
     </aside>
-  )
+  </>
+)
 }
