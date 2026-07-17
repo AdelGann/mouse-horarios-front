@@ -25,6 +25,8 @@ interface TimeSlot {
   blockIndex: number
   timeLabel: string
   roomName?: string
+  startTime?: string
+  endTime?: string
 }
 
 interface Subject {
@@ -161,7 +163,9 @@ export function MockSchedulerPreview({ initialDraftId }: MockSchedulerPreviewPro
             day: slot.dayOfWeek,
             blockIndex: getBlockIndex(slot.startTime),
             timeLabel: `${slot.startTime} - ${slot.endTime}`,
-            roomName: slot.room?.name || "Sin Aula"
+            roomName: slot.room?.name || "Sin Aula",
+            startTime: slot.startTime,
+            endTime: slot.endTime
           }))
 
           parsedSubjects.push({
@@ -264,8 +268,28 @@ export function MockSchedulerPreview({ initialDraftId }: MockSchedulerPreviewPro
 
   // Helper to query slot content
   const getPersonalSlotContent = (day: number, blockIndex: number) => {
+    const block = TIME_BLOCKS[blockIndex]
+    if (!block) return undefined
+    
+    const [bHStart, bMStart] = block.startTime.split(":").map(Number)
+    const [bHEnd, bMEnd] = block.endTime.split(":").map(Number)
+    const bStart = bHStart * 60 + bMStart
+    const bEnd = bHEnd * 60 + bMEnd
+
     return mySchedule.find((sub) =>
-      sub.slots.some((slot) => slot.day === day && slot.blockIndex === blockIndex)
+      sub.slots.some((slot) => {
+        if (slot.day !== day) return false
+        const startTime = slot.startTime || slot.timeLabel.split(" - ")[0]
+        const endTime = slot.endTime || slot.timeLabel.split(" - ")[1]
+        if (!startTime || !endTime) return false
+
+        const [sHStart, sMStart] = startTime.split(":").map(Number)
+        const [sHEnd, sMEnd] = endTime.split(":").map(Number)
+        const sStart = sHStart * 60 + sMStart
+        const sEnd = sHEnd * 60 + sMEnd
+
+        return bStart < sEnd && sStart < bEnd
+      })
     )
   }
 
@@ -305,7 +329,9 @@ export function MockSchedulerPreview({ initialDraftId }: MockSchedulerPreviewPro
         day: slot.dayOfWeek,
         blockIndex: getBlockIndex(slot.startTime),
         timeLabel: `${slot.startTime} - ${slot.endTime}`,
-        roomName: slot.room?.name || "Sin Aula"
+        roomName: slot.room?.name || "Sin Aula",
+        startTime: slot.startTime,
+        endTime: slot.endTime
       }))
 
       return {
