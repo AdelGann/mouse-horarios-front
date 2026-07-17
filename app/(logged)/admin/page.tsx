@@ -29,6 +29,203 @@ import { useNotices } from "@/lib/hooks/useNotices"
 import { AdminCrudTable } from "@/components/custom/admin-crud-table"
 import { toast } from "react-hot-toast"
 
+// ─── GlobalScheduleEditForm ───────────────────────────────────────────────────
+// Extracted as a proper component so hooks are called at the top level (React rules of hooks)
+interface GlobalScheduleEditFormProps {
+  item: any
+  terms: any[]
+  sections: any[]
+  careers: any[]
+  courses: any[]
+  teachers: any[]
+  rooms: any[]
+  onSave: (payload: any) => Promise<void>
+  onClose: () => void
+}
+
+function GlobalScheduleEditForm({
+  item, terms, sections, careers, courses, teachers, rooms, onSave, onClose
+}: GlobalScheduleEditFormProps) {
+  const [editTermId, setEditTermId] = React.useState(item.term?.id || "")
+  const [editSectionId, setEditSectionId] = React.useState(item.section?.id || "")
+  const [editSemester, setEditSemester] = React.useState(String(item.semester || "1"))
+  const [editCareerId, setEditCareerId] = React.useState(
+    item.subjects?.[0]?.course?.career?.id || careers[0]?.id || ""
+  )
+  const [editSubjects, setEditSubjects] = React.useState<any[]>(
+    item.subjects?.length > 0
+      ? item.subjects.map((sub: any) => ({
+          courseId: sub.course?.id || "",
+          teacherId: sub.teacher?.id || "",
+          slots: sub.slots?.map((slot: any) => ({
+            dayOfWeek: slot.dayOfWeek,
+            startTime: slot.startTime,
+            endTime: slot.endTime,
+            roomId: slot.room?.id || ""
+          })) || [{ dayOfWeek: 1, startTime: "07:00", endTime: "08:30", roomId: "" }]
+        }))
+      : [{ courseId: "", teacherId: "", slots: [{ dayOfWeek: 1, startTime: "07:00", endTime: "08:30", roomId: "" }] }]
+  )
+  const [saving, setSaving] = React.useState(false)
+
+  const filteredCourses = courses.filter(
+    (c: any) => c.careerId === editCareerId && c.semester === parseInt(editSemester)
+  )
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSaving(true)
+    try {
+      await onSave({
+        id: item.id,
+        termId: editTermId,
+        sectionId: editSectionId,
+        semester: parseInt(editSemester),
+        subjects: editSubjects
+      })
+      onClose()
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const updateSubject = (si: number, field: string, val: any) =>
+    setEditSubjects(prev => prev.map((s, i) => i === si ? { ...s, [field]: val } : s))
+
+  const updateSlot = (si: number, slIdx: number, field: string, val: any) =>
+    setEditSubjects(prev => prev.map((s, i) => i === si
+      ? { ...s, slots: s.slots.map((sl: any, j: number) => j === slIdx ? { ...sl, [field]: val } : sl) }
+      : s))
+
+  return (
+    <form onSubmit={handleSave} className="space-y-4 font-sans max-h-[65vh] overflow-y-auto pr-1">
+      {/* Header fields */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="gs-term">Lapso Académico</Label>
+          <Select id="gs-term" value={editTermId} onChange={e => setEditTermId(e.target.value)}>
+            {terms.map((t: any) => <option key={t.id} value={t.id}>{t.name}</option>)}
+          </Select>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="gs-sec">Sección</Label>
+          <Select id="gs-sec" value={editSectionId} onChange={e => setEditSectionId(e.target.value)}>
+            {sections.map((s: any) => <option key={s.id} value={s.id}>{s.name}</option>)}
+          </Select>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="gs-career">Carrera</Label>
+          <Select id="gs-career" value={editCareerId} onChange={e => setEditCareerId(e.target.value)}>
+            {careers.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </Select>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="gs-sem">Semestre</Label>
+          <Select id="gs-sem" value={editSemester} onChange={e => setEditSemester(e.target.value)}>
+            {Array.from({ length: 10 }, (_, i) => i + 1).map(s => (
+              <option key={s} value={s}>Semestre {s}</option>
+            ))}
+          </Select>
+        </div>
+      </div>
+
+      {/* Subjects list */}
+      <div className="border-t border-border/60 pt-3 space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Materias</span>
+          <Button type="button" variant="outline" size="xs" className="gap-1 cursor-pointer"
+            onClick={() => setEditSubjects(prev => [...prev, {
+              courseId: "", teacherId: "",
+              slots: [{ dayOfWeek: 1, startTime: "07:00", endTime: "08:30", roomId: "" }]
+            }])}>
+            <Plus className="size-3" /> Agregar
+          </Button>
+        </div>
+
+        {editSubjects.map((sub, si) => (
+          <div key={si} className="p-3 border border-border/50 rounded-lg bg-muted/5 space-y-2">
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex flex-col gap-1">
+                <Label className="text-[10px]">Materia</Label>
+                <Select value={sub.courseId} onChange={e => updateSubject(si, "courseId", e.target.value)}>
+                  <option value="">-- Selecciona --</option>
+                  {filteredCourses.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </Select>
+              </div>
+              <div className="flex items-end gap-1">
+                <div className="flex-1 flex flex-col gap-1">
+                  <Label className="text-[10px]">Profesor</Label>
+                  <Select value={sub.teacherId} onChange={e => updateSubject(si, "teacherId", e.target.value)}>
+                    <option value="">Sin Profesor</option>
+                    {teachers.map((t: any) => <option key={t.id} value={t.id}>{t.name}</option>)}
+                  </Select>
+                </div>
+                <Button type="button" variant="ghost" size="icon-xs"
+                  disabled={editSubjects.length === 1}
+                  className="text-destructive hover:bg-destructive/10 cursor-pointer mb-0.5"
+                  onClick={() => setEditSubjects(prev => prev.filter((_, i) => i !== si))}>
+                  <Trash2 className="size-3.5" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Slots */}
+            {sub.slots.map((slot: any, slIdx: number) => (
+              <div key={slIdx} className="grid grid-cols-12 gap-1.5 items-center pl-2 border-l-2 border-primary/20">
+                <div className="col-span-3">
+                  <Select value={slot.dayOfWeek} onChange={e => updateSlot(si, slIdx, "dayOfWeek", parseInt(e.target.value))}>
+                    <option value={1}>Lunes</option>
+                    <option value={2}>Martes</option>
+                    <option value={3}>Miércoles</option>
+                    <option value={4}>Jueves</option>
+                    <option value={5}>Viernes</option>
+                  </Select>
+                </div>
+                <div className="col-span-2">
+                  <Input type="time" value={slot.startTime} className="h-7 text-[10px]"
+                    onChange={e => updateSlot(si, slIdx, "startTime", e.target.value)} />
+                </div>
+                <span className="col-span-1 text-center text-[10px] text-muted-foreground">a</span>
+                <div className="col-span-2">
+                  <Input type="time" value={slot.endTime} className="h-7 text-[10px]"
+                    onChange={e => updateSlot(si, slIdx, "endTime", e.target.value)} />
+                </div>
+                <div className="col-span-3">
+                  <Select value={slot.roomId} onChange={e => updateSlot(si, slIdx, "roomId", e.target.value)}>
+                    <option value="">Sin Aula</option>
+                    {rooms.map((r: any) => <option key={r.id} value={r.id}>{r.name}</option>)}
+                  </Select>
+                </div>
+                <div className="col-span-1 flex justify-end">
+                  <Button type="button" variant="ghost" size="icon-xs"
+                    disabled={sub.slots.length === 1}
+                    className="text-destructive hover:bg-destructive/10 cursor-pointer"
+                    onClick={() => setEditSubjects(prev => prev.map((s, i) => i === si
+                      ? { ...s, slots: s.slots.filter((_: any, j: number) => j !== slIdx) }
+                      : s))}>
+                    <Trash2 className="size-3" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+            <Button type="button" variant="ghost" size="xs" className="text-[10px] h-6 px-2 cursor-pointer"
+              onClick={() => setEditSubjects(prev => prev.map((s, i) => i === si
+                ? { ...s, slots: [...s.slots, { dayOfWeek: 1, startTime: "07:00", endTime: "08:30", roomId: "" }] }
+                : s))}>
+              + Bloque de hora
+            </Button>
+          </div>
+        ))}
+      </div>
+
+      <Button type="submit" className="w-full cursor-pointer mt-2" disabled={saving}>
+        {saving ? <Loader2 className="size-4 animate-spin mr-2" /> : <Save className="size-4 mr-2" />}
+        Guardar Cambios
+      </Button>
+    </form>
+  )
+}
+
 export default function AdminPage() {
   const [activeTab, setActiveTab] = React.useState("horarios")
   
@@ -724,6 +921,18 @@ export default function AdminPage() {
                     key: "term", 
                     render: (item: any) => item.term?.name || "N/A" 
                   },
+                  {
+                    label: "Carrera",
+                    key: "career",
+                    render: (item: any) => {
+                      const career = item.subjects?.[0]?.course?.career
+                      return career ? (
+                        <span className="font-medium text-foreground/90">{career.name}</span>
+                      ) : (
+                        <span className="text-muted-foreground italic text-[10px]">Sin carrera</span>
+                      )
+                    }
+                  },
                   { 
                     label: "Sección", 
                     key: "section", 
@@ -732,19 +941,36 @@ export default function AdminPage() {
                   { 
                     label: "Semestre", 
                     key: "semester", 
-                    render: (item: any) => `${item.semester} Semestre` 
+                    render: (item: any) => `${item.semester}° Sem.`
                   },
                   { 
-                    label: "Materias Ofertadas", 
+                    label: "Materias", 
                     key: "subjects",
                     render: (item: any) => (
-                      <span className="font-mono bg-muted/50 border border-border px-1.5 py-0.5 rounded-sm">
+                      <span className="font-mono bg-primary/8 text-primary border border-primary/20 px-1.5 py-0.5 rounded-sm text-[10px] font-semibold">
                         {item.subjects?.length || 0} materias
                       </span>
                     )
                   }
                 ]}
                 onDelete={handleDeleteGlobalSchedule}
+                renderEditForm={(item: any, close) => (
+                  <GlobalScheduleEditForm
+                    item={item}
+                    terms={terms}
+                    sections={sections}
+                    careers={careers}
+                    courses={courses}
+                    teachers={teachers}
+                    rooms={rooms}
+                    onSave={async (payload) => {
+                      await loadGlobalSchedule(payload)
+                      toast.success("Horario actualizado exitosamente")
+                      fetchData()
+                    }}
+                    onClose={close}
+                  />
+                )}
               />
             </div>
           )}

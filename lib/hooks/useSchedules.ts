@@ -8,11 +8,16 @@ export function useSchedules() {
   const getTerms = async (): Promise<any> => api.get("schedule/terms")
   const createTerm = async (data: any): Promise<any> => api.post("schedule/terms", data)
 
-  // Load global schedule by section (Admin)
+  // Load or update global schedule (Admin)
+  // If scheduleData.id is present → PUT (edit existing), else → POST (create new)
   const loadGlobalSchedule = async (scheduleData: any): Promise<any> => {
     setLoading(true)
     try {
-      return await api.post("schedule/global", scheduleData)
+      const { id, ...body } = scheduleData
+      if (id) {
+        return await api.put(`schedule/global/${id}`, body)
+      }
+      return await api.post("schedule/global", body)
     } finally {
       setLoading(false)
     }
