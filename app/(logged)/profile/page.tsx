@@ -14,7 +14,8 @@ import {
   Laptop,
   Check,
   Lock,
-  Pipette
+  Pipette,
+  Trash2
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -190,6 +191,35 @@ export default function ProfilePage() {
       toast.success("Foto de perfil cargada con éxito")
     } catch (e: any) {
       toast.error(e.message || "Error al cargar la foto")
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  // Delete photo
+  const handleDeletePhoto = async () => {
+    if (!confirm("¿Seguro que deseas eliminar tu foto de perfil?")) return
+    setUploading(true)
+    try {
+      const updatedUser = await updateProfile({
+        img_url: null
+      })
+
+      if (typeof window !== "undefined") {
+        const session = localStorage.getItem("user_session")
+        if (session) {
+          const parsed = JSON.parse(session)
+          const newSession = { ...parsed, img_url: null }
+          localStorage.setItem("user_session", JSON.stringify(newSession))
+          window.dispatchEvent(new Event("storage"))
+          window.dispatchEvent(new Event("profile_updated"))
+        }
+      }
+
+      setUser(updatedUser)
+      toast.success("Foto de perfil eliminada")
+    } catch (e: any) {
+      toast.error(e.message || "Error al eliminar foto de perfil")
     } finally {
       setUploading(false)
     }
@@ -488,6 +518,19 @@ export default function ProfilePage() {
                   }`}>
                     Rol: {user.role === "ADMIN" ? "Administrador" : "Estudiante"}
                   </span>
+
+                  {user.img_url && (
+                    <Button 
+                      variant="ghost" 
+                      size="xs" 
+                      onClick={handleDeletePhoto} 
+                      disabled={uploading}
+                      className="text-destructive hover:bg-destructive/10 cursor-pointer text-[10px] h-6 px-2.5 gap-1.5"
+                    >
+                      <Trash2 className="size-3.5" />
+                      <span>Eliminar Foto</span>
+                    </Button>
+                  )}
 
                   {uploading && (
                     <span className="text-[10px] text-muted-foreground animate-pulse">

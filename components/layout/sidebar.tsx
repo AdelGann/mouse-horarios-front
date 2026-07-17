@@ -48,14 +48,10 @@ const NAVIGATION_OPTIONS: SidebarOption[] = [
     icon: PlusCircle,
   },
   {
-    name: "Mi Perfil",
-    href: "/profile",
-    icon: User,
-  },
-  {
     name: "Configuración",
     icon: Settings,
     subOptions: [
+      { name: "Mi Perfil", href: "/profile" },
       { name: "Preferencias de Tema", href: "/profile#temas" },
       { name: "Seguridad y Accesos", href: "/profile#seguridad" },
     ],
@@ -82,7 +78,14 @@ export function Sidebar() {
         setUser(JSON.parse(session))
       }
     } catch (_) {}
-  }, [])
+
+    // Auto expand config or admin categories on mount/pathname load
+    if (pathname.startsWith("/profile")) {
+      setExpandedMenus(prev => ({ ...prev, Configuración: true }))
+    } else if (pathname.startsWith("/admin")) {
+      setExpandedMenus(prev => ({ ...prev, Administración: true }))
+    }
+  }, [pathname])
 
   const toggleSubmenu = (name: string) => {
     setExpandedMenus((prev) => ({
