@@ -312,9 +312,9 @@ export default function AdminPage() {
       const rms = await getRooms()
       setRooms(rms)
       if (rms.length > 0) {
-        setSchedSubjects(prev => prev.map(s => ({
+        setSchedSubjects(prev => prev.map((s: any) => ({
           ...s,
-          slots: s.slots.map(sl => ({ ...sl, roomId: sl.roomId || rms[0].id }))
+          slots: s.slots.map((sl: any) => ({ ...sl, roomId: sl.roomId || rms[0].id }))
         })))
       }
 

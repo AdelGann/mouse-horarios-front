@@ -141,7 +141,7 @@ export function MockSchedulerPreview({ initialDraftId }: MockSchedulerPreviewPro
     getSections()
       .then(res => setSections(res))
       .catch(console.error)
-  }, [getCareers, getSections])
+  }, [])
 
   // Load section-based schedules
   const fetchSchedules = React.useCallback(async () => {
@@ -413,6 +413,7 @@ export function MockSchedulerPreview({ initialDraftId }: MockSchedulerPreviewPro
                     const currentSlot = subject?.slots?.find(s => s.day === day.value && s.blockIndex === block.index)
                     const room = currentSlot?.roomName || "Sin Aula"
                     const timeLabel = currentSlot?.timeLabel || ""
+                    const isEarlyBlock = block.index < 3
 
                     return (
                       <td
@@ -443,7 +444,14 @@ export function MockSchedulerPreview({ initialDraftId }: MockSchedulerPreviewPro
                             </button>
 
                             {/* Tooltip flotante estético al hacer Hover */}
-                            <div className="absolute bottom-[calc(100%-4px)] left-1/2 -translate-x-1/2 mb-2 z-30 hidden group-hover:flex flex-col w-52 p-3 bg-card border border-border text-card-foreground rounded-lg shadow-xl pointer-events-none animate-in fade-in zoom-in-95 duration-150">
+                            <div
+                              className={cn(
+                                "absolute left-1/2 -translate-x-1/2 z-50 hidden group-hover:flex flex-col w-52 p-3 bg-card border border-border text-card-foreground rounded-lg shadow-xl pointer-events-none animate-in fade-in zoom-in-95 duration-150",
+                                isEarlyBlock 
+                                  ? "top-[calc(100%+6px)] mt-1" 
+                                  : "bottom-[calc(100%+6px)] mb-1"
+                              )}
+                            >
                               <span className="font-bold text-[9px] text-primary uppercase tracking-wider mb-1.5 border-b border-border/50 pb-1">
                                 Información de Clase
                               </span>
@@ -458,7 +466,14 @@ export function MockSchedulerPreview({ initialDraftId }: MockSchedulerPreviewPro
                                 <p><strong className="text-muted-foreground">Horario:</strong> <span className="font-mono text-foreground ml-1">{timeLabel}</span></p>
                               </div>
                               {/* Flecha del tooltip */}
-                              <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 w-2.5 h-2.5 bg-card border-r border-b border-border rotate-45" />
+                              <div
+                                className={cn(
+                                  "absolute w-2 h-2 bg-card border rotate-45 pointer-events-none",
+                                  isEarlyBlock
+                                    ? "bottom-full left-1/2 -translate-x-1/2 translate-y-1/2 border-t border-l border-b-0 border-r-0"
+                                    : "top-full left-1/2 -translate-x-1/2 -translate-y-1/2 border-b border-r border-t-0 border-l-0"
+                                )}
+                              />
                             </div>
                           </div>
                         ) : (
