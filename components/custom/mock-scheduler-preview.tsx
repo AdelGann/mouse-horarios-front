@@ -24,6 +24,7 @@ interface TimeSlot {
   day: number
   blockIndex: number
   timeLabel: string
+  roomName?: string
 }
 
 interface Subject {
@@ -153,7 +154,8 @@ export function MockSchedulerPreview({ initialDraftId }: MockSchedulerPreviewPro
           const slots: TimeSlot[] = (sub.slots || []).map((slot: any) => ({
             day: slot.dayOfWeek,
             blockIndex: getBlockIndex(slot.startTime),
-            timeLabel: `${slot.startTime} - ${slot.endTime}`
+            timeLabel: `${slot.startTime} - ${slot.endTime}`,
+            roomName: slot.room?.name || "Sin Aula"
           }))
 
           parsedSubjects.push({
@@ -296,7 +298,8 @@ export function MockSchedulerPreview({ initialDraftId }: MockSchedulerPreviewPro
       const slots = (sub.slots || []).map((slot: any) => ({
         day: slot.dayOfWeek,
         blockIndex: getBlockIndex(slot.startTime),
-        timeLabel: `${slot.startTime} - ${slot.endTime}`
+        timeLabel: `${slot.startTime} - ${slot.endTime}`,
+        roomName: slot.room?.name || "Sin Aula"
       }))
 
       return {
@@ -399,6 +402,12 @@ export function MockSchedulerPreview({ initialDraftId }: MockSchedulerPreviewPro
                   </td>
                   {DAYS.map((day) => {
                     const subject = getPersonalSlotContent(day.value, block.index)
+                    
+                    // Buscar el aula y la etiqueta de hora específicos para este bloque en el canvas
+                    const currentSlot = subject?.slots?.find(s => s.day === day.value && s.blockIndex === block.index)
+                    const room = currentSlot?.roomName || "Sin Aula"
+                    const timeLabel = currentSlot?.timeLabel || ""
+
                     return (
                       <td
                         key={day.value}
@@ -421,11 +430,30 @@ export function MockSchedulerPreview({ initialDraftId }: MockSchedulerPreviewPro
                             </div>
                             <button
                               onClick={() => removeSubject(subject)}
-                              className="absolute top-1 right-1 p-0.5 bg-background border border-border text-destructive hover:bg-destructive hover:text-white rounded-none hidden group-hover:block transition-all shadow-xs cursor-pointer"
+                              className="absolute top-1 right-1 p-0.5 bg-background border border-border text-destructive hover:bg-destructive hover:text-white rounded-none hidden group-hover:block transition-all shadow-xs cursor-pointer z-10"
                               title="Remover materia"
                             >
                               <Trash2 className="size-3" />
                             </button>
+
+                            {/* Tooltip flotante estético al hacer Hover */}
+                            <div className="absolute bottom-[calc(100%-4px)] left-1/2 -translate-x-1/2 mb-2 z-30 hidden group-hover:flex flex-col w-52 p-3 bg-card border border-border text-card-foreground rounded-lg shadow-xl pointer-events-none animate-in fade-in zoom-in-95 duration-150">
+                              <span className="font-bold text-[9px] text-primary uppercase tracking-wider mb-1.5 border-b border-border/50 pb-1">
+                                Información de Clase
+                              </span>
+                              <div className="space-y-1 text-[9px] text-left">
+                                <p className="truncate"><strong className="text-muted-foreground">Materia:</strong> <span className="font-medium text-foreground">{subject.name}</span></p>
+                                <p><strong className="text-muted-foreground">Profesor:</strong> <span className="font-medium text-foreground">{subject.teacher}</span></p>
+                                <div className="grid grid-cols-2 gap-1 py-0.5">
+                                  <p><strong className="text-muted-foreground">Sección:</strong> <span className="font-bold text-foreground">{subject.section}</span></p>
+                                  <p><strong className="text-muted-foreground">Código:</strong> <span className="font-mono text-foreground">{subject.code}</span></p>
+                                </div>
+                                <p><strong className="text-muted-foreground">Aula:</strong> <span className="bg-primary/10 text-primary font-bold px-1.5 py-0.5 rounded-sm ml-1 text-[8.5px]">{room}</span></p>
+                                <p><strong className="text-muted-foreground">Horario:</strong> <span className="font-mono text-foreground ml-1">{timeLabel}</span></p>
+                              </div>
+                              {/* Flecha del tooltip */}
+                              <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 w-2.5 h-2.5 bg-card border-r border-b border-border rotate-45" />
+                            </div>
                           </div>
                         ) : (
                           <div className="h-full w-full flex items-center justify-center text-[10px] text-muted-foreground/30 font-mono select-none">
