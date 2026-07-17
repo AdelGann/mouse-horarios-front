@@ -65,7 +65,11 @@ const SUBJECT_COLORS = [
   "bg-fuchsia-500/10 text-fuchsia-500 border-fuchsia-500/20 dark:bg-fuchsia-500/20 dark:text-fuchsia-400 dark:border-fuchsia-500/30",
 ]
 
-export function MockSchedulerPreview() {
+interface MockSchedulerPreviewProps {
+  initialDraftId?: string | null
+}
+
+export function MockSchedulerPreview({ initialDraftId }: MockSchedulerPreviewProps = {}) {
   const [user, setUser] = React.useState<any>(null)
   
   // Custom hooks
@@ -300,6 +304,18 @@ export function MockSchedulerPreview() {
     setDraftName(draft.name)
     toast.success(`Cargado borrador: ${draft.name}`)
   }
+
+  // Auto-load draft if initialDraftId was provided (must be after handleLoadDraft is defined)
+  const [autoLoaded, setAutoLoaded] = React.useState(false)
+  React.useEffect(() => {
+    if (!autoLoaded && initialDraftId && personalDrafts.length > 0) {
+      const targetDraft = personalDrafts.find((d: any) => d.id === initialDraftId)
+      if (targetDraft) {
+        handleLoadDraft(targetDraft)
+        setAutoLoaded(true)
+      }
+    }
+  }, [initialDraftId, personalDrafts, autoLoaded])
 
   return (
     <div id="demo" className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start scroll-mt-20 font-sans">

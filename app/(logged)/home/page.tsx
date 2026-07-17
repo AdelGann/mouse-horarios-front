@@ -63,7 +63,7 @@ export default function HomeRoute() {
   }
 
   return (
-    <div className="flex-1 p-6 overflow-y-auto max-h-[calc(100vh-3.5rem)] font-sans">
+    <div className="flex-1 p-6 font-sans">
       {/* Main Content: Split Grid for News and Drafts */}
       <div className="max-w-6xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
         
@@ -108,7 +108,7 @@ export default function HomeRoute() {
               <h1 className="text-xs font-bold uppercase tracking-wider text-foreground">Mis Borradores de Horarios</h1>
               <p className="text-[10px] text-muted-foreground mt-0.5">Administra y edita tus propuestas para el semestre.</p>
             </div>
-            <Link href="/schedules/new">
+            <Link href="/schedules/canvas?id=new">
               <Button size="sm" className="gap-1.5 cursor-pointer">
                 <Plus className="size-4" />
                 Crear Horario en Canvas
@@ -157,7 +157,7 @@ export default function HomeRoute() {
                     <span className="text-[9px] font-mono bg-muted px-1.5 py-0.5 border border-border rounded-sm">
                       Formato: Digital
                     </span>
-                    <Link href="/schedules/new">
+                    <Link href="/schedules/canvas?id=new">
                       <Button variant="ghost" size="xs" className="gap-1 cursor-pointer">
                         Editar en Canvas
                         <ChevronRight className="size-3" />

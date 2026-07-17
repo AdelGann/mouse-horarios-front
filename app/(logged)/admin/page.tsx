@@ -390,7 +390,7 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="flex-1 p-6 space-y-6 overflow-y-auto max-h-[calc(100vh-3.5rem)] font-sans">
+    <div className="flex-1 p-6 space-y-6 font-sans">
       
       {/* Page Header */}
       <div className="flex items-center gap-3 border-b border-border/50 pb-4">

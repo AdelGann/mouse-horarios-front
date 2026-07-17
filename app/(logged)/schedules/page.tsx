@@ -37,7 +37,7 @@ export default function SchedulesPage() {
   }
 
   return (
-    <div className="flex-1 p-6 space-y-6 overflow-y-auto max-h-[calc(100vh-3.5rem)] font-sans max-w-5xl mx-auto">
+    <div className="flex-1 p-6 space-y-6 font-sans max-w-5xl mx-auto">
       {/* Page Header */}
       <div className="flex justify-between items-center border-b border-border pb-4">
         <div className="flex items-center gap-3">
@@ -54,7 +54,7 @@ export default function SchedulesPage() {
           </div>
         </div>
 
-        <Link href="/schedules/new">
+        <Link href="/schedules/canvas?id=new">
           <Button size="sm" className="gap-1.5 cursor-pointer">
             <Plus className="size-4" />
             Nuevo Horario
@@ -72,7 +72,7 @@ export default function SchedulesPage() {
         <div className="border border-dashed border-border p-16 text-center text-xs text-muted-foreground rounded-2xl bg-card/20 font-mono">
           No tienes ningún borrador guardado en tu cuenta.
           <div className="mt-4">
-            <Link href="/schedules/new">
+            <Link href="/schedules/canvas?id=new">
               <Button size="xs" variant="outline" className="cursor-pointer">
                 Crear mi primer borrador
               </Button>
@@ -110,7 +110,7 @@ export default function SchedulesPage() {
                 <span className="text-[9px] font-mono bg-muted px-1.5 py-0.5 border border-border rounded-sm">
                   Formato: Digital
                 </span>
-                <Link href="/schedules/new">
+                <Link href={`/schedules/canvas?id=${draft.id}`}>
                   <Button variant="ghost" size="xs" className="gap-1 cursor-pointer">
                     Editar en Canvas
                     <ChevronRight className="size-3" />

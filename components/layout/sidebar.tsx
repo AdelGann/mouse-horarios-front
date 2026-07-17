@@ -44,7 +44,7 @@ const NAVIGATION_OPTIONS: SidebarOption[] = [
   },
   {
     name: "Nuevo Horario",
-    href: "/schedules/new",
+    href: "/schedules/canvas?id=new",
     icon: PlusCircle,
   },
   {
@@ -118,7 +118,7 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="w-64 border-r border-border bg-sidebar text-sidebar-foreground flex flex-col min-h-screen shrink-0 font-sans">
+    <aside className="w-64 border-r border-border bg-sidebar text-sidebar-foreground flex flex-col h-screen sticky top-0 shrink-0 font-sans overflow-hidden">
       {/* Brand logo header */}
       <div className="h-14 border-b border-border flex items-center px-4 gap-2.5 bg-sidebar">
         <div className="flex h-7 w-7 items-center justify-center bg-sidebar-primary text-sidebar-primary-foreground rounded-lg">
@@ -135,7 +135,7 @@ export function Sidebar() {
       </div>
 
       {/* Nav List */}
-      <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
+      <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto scrollbar-thin">
         {optionsToRender.map((option) => {
           const hasSubOptions = !!option.subOptions
           const isExpanded = expandedMenus[option.name]
