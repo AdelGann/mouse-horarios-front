@@ -51,13 +51,21 @@ export function useAcademic() {
   const getUsers = async (): Promise<any> => api.get("users")
   const deleteUser = async (id: string): Promise<any> => api.delete(`users/${id}`)
 
+  // Update operations
+  const updateDeanery = async (id: string, data: any): Promise<any> => api.put(`academic/deaneries/${id}`, data)
+  const updateCareer = async (id: string, data: any): Promise<any> => api.put(`academic/careers/${id}`, data)
+  const updateCourse = async (id: string, data: any): Promise<any> => api.put(`academic/courses/${id}`, data)
+  const updateTeacher = async (id: string, data: any): Promise<any> => api.put(`academic/teachers/${id}`, data)
+  const updateSection = async (id: string, data: any): Promise<any> => api.put(`academic/sections/${id}`, data)
+  const updateRoom = async (id: string, data: any): Promise<any> => api.put(`academic/rooms/${id}`, data)
+
   return {
-    getDeaneries, createDeanery,
-    getCareers, createCareer,
-    getCourses, createCourse, deleteCourse,
-    getSections, createSection, deleteSection,
-    getTeachers, createTeacher, deleteTeacher,
-    getRooms, createRoom, deleteRoom,
+    getDeaneries, createDeanery, updateDeanery,
+    getCareers, createCareer, updateCareer,
+    getCourses, createCourse, deleteCourse, updateCourse,
+    getSections, createSection, deleteSection, updateSection,
+    getTeachers, createTeacher, deleteTeacher, updateTeacher,
+    getRooms, createRoom, deleteRoom, updateRoom,
     getLogs, getUsers, deleteUser,
     loading
   }

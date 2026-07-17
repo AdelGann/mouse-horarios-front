@@ -22,6 +22,15 @@ export function useNotices() {
     }
   }
 
+  const updateNotice = async (id: string, noticeData: any): Promise<any> => {
+    setLoading(true)
+    try {
+      return await api.put(`notices/${id}`, noticeData)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const deleteNotice = async (id: string): Promise<any> => {
     setLoading(true)
     try {
@@ -31,5 +40,5 @@ export function useNotices() {
     }
   }
 
-  return { getNotices, createNotice, deleteNotice, loading }
+  return { getNotices, createNotice, updateNotice, deleteNotice, loading }
 }

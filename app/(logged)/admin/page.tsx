@@ -34,17 +34,17 @@ export default function AdminPage() {
   
   // Custom hooks
   const { 
-    getDeaneries, createDeanery,
-    getCareers, createCareer,
-    getCourses, createCourse, deleteCourse,
-    getSections, createSection, deleteSection,
-    getTeachers, createTeacher, deleteTeacher,
-    getRooms, createRoom, deleteRoom,
+    getDeaneries, createDeanery, updateDeanery,
+    getCareers, createCareer, updateCareer,
+    getCourses, createCourse, deleteCourse, updateCourse,
+    getSections, createSection, deleteSection, updateSection,
+    getTeachers, createTeacher, deleteTeacher, updateTeacher,
+    getRooms, createRoom, deleteRoom, updateRoom,
     getLogs, getUsers, deleteUser
   } = useAcademic()
 
-  const { getTerms, createTerm, loadGlobalSchedule } = useSchedules()
-  const { getNotices, createNotice, deleteNotice } = useNotices()
+  const { getTerms, createTerm, loadGlobalSchedule, getGlobalSchedules, deleteGlobalSchedule } = useSchedules()
+  const { getNotices, createNotice, updateNotice, deleteNotice } = useNotices()
 
   // Data lists
   const [deaneries, setDeaneries] = React.useState<any[]>([])
@@ -57,6 +57,7 @@ export default function AdminPage() {
   const [users, setUsers] = React.useState<any[]>([])
   const [terms, setTerms] = React.useState<any[]>([])
   const [notices, setNotices] = React.useState<any[]>([])
+  const [globalSchedules, setGlobalSchedules] = React.useState<any[]>([])
 
   // Loading states
   const [loading, setLoading] = React.useState(false)
@@ -118,6 +119,9 @@ export default function AdminPage() {
 
       const nts = await getNotices()
       setNotices(nts)
+
+      const gs = await getGlobalSchedules()
+      setGlobalSchedules(gs)
     } catch (e: any) {
       console.error("Failed to load admin data:", e)
     }
@@ -286,6 +290,16 @@ export default function AdminPage() {
     try {
       await deleteNotice(id)
       toast.success("Aviso eliminado")
+      fetchData()
+    } catch (e: any) {
+      toast.error(e.message)
+    }
+  }
+
+  const handleDeleteGlobalSchedule = async (id: string) => {
+    try {
+      await deleteGlobalSchedule(id)
+      toast.success("Horario global eliminado exitosamente")
       fetchData()
     } catch (e: any) {
       toast.error(e.message)
@@ -504,188 +518,235 @@ export default function AdminPage() {
 
           {/* TAB: HORARIOS BUILDER */}
           {activeTab === "horarios" && (
-            <Card className="border border-border/80 shadow-md rounded-2xl overflow-hidden bg-card/60 backdrop-blur-xs">
-              <CardHeader className="pb-3 border-b border-border/50">
-                <CardTitle className="text-xs uppercase font-bold text-foreground">
-                  Creador y Carga de Horarios Globales
-                </CardTitle>
-                <CardDescription>
-                  Elige el lapso académico, carrera, semestre y sección para diagramar el horario escolar.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-4 space-y-6">
-                
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                  <div className="flex flex-col gap-1">
-                    <Label htmlFor="schedTerm">Lapso Académico</Label>
-                    <Select
-                      id="schedTerm"
-                      value={schedTermId}
-                      onChange={(e) => setSchedTermId(e.target.value)}
-                    >
-                      {terms.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-                    </Select>
+            <div className="space-y-6">
+              <Card className="border border-border/80 shadow-md rounded-2xl overflow-hidden bg-card/60 backdrop-blur-xs">
+                <CardHeader className="pb-3 border-b border-border/50">
+                  <CardTitle className="text-xs uppercase font-bold text-foreground">
+                    Creador y Carga de Horarios Globales
+                  </CardTitle>
+                  <CardDescription>
+                    Elige el lapso académico, carrera, semestre y sección para diagramar el horario escolar.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-4 space-y-6">
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                    <div className="flex flex-col gap-1">
+                      <Label htmlFor="schedTerm">Lapso Académico</Label>
+                      <Select
+                        id="schedTerm"
+                        value={schedTermId}
+                        onChange={(e) => setSchedTermId(e.target.value)}
+                      >
+                        {terms.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                      </Select>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <Label htmlFor="schedCareer">Carrera</Label>
+                      <Select
+                        id="schedCareer"
+                        value={schedCareerId}
+                        onChange={(e) => setSchedCareerId(e.target.value)}
+                      >
+                        {careers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                      </Select>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <Label htmlFor="schedSem">Semestre</Label>
+                      <Select
+                        id="schedSem"
+                        value={schedSemester}
+                        onChange={(e) => setSchedSemester(e.target.value)}
+                      >
+                        {Array.from({ length: 10 }, (_, i) => i + 1).map(s => (
+                          <option key={s} value={s}>Semestre {s}</option>
+                        ))}
+                      </Select>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <Label htmlFor="schedSec">Sección</Label>
+                      <Select
+                        id="schedSec"
+                        value={schedSectionId}
+                        onChange={(e) => setSchedSectionId(e.target.value)}
+                      >
+                        {sections.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                      </Select>
+                    </div>
                   </div>
 
-                  <div className="flex flex-col gap-1">
-                    <Label htmlFor="schedCareer">Carrera</Label>
-                    <Select
-                      id="schedCareer"
-                      value={schedCareerId}
-                      onChange={(e) => setSchedCareerId(e.target.value)}
-                    >
-                      {careers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                    </Select>
-                  </div>
+                  <div className="border-t border-border/60 pt-4 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                        Materias y Bloques de Clase
+                      </h3>
+                      <Button variant="outline" size="xs" onClick={addSubjectRow} className="gap-1 cursor-pointer">
+                        <Plus className="size-3" />
+                        Agregar Materia
+                      </Button>
+                    </div>
 
-                  <div className="flex flex-col gap-1">
-                    <Label htmlFor="schedSem">Semestre</Label>
-                    <Select
-                      id="schedSem"
-                      value={schedSemester}
-                      onChange={(e) => setSchedSemester(e.target.value)}
-                    >
-                      {Array.from({ length: 10 }, (_, i) => i + 1).map(s => (
-                        <option key={s} value={s}>Semestre {s}</option>
-                      ))}
-                    </Select>
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <Label htmlFor="schedSec">Sección</Label>
-                    <Select
-                      id="schedSec"
-                      value={schedSectionId}
-                      onChange={(e) => setSchedSectionId(e.target.value)}
-                    >
-                      {sections.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="border-t border-border/60 pt-4 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                      Materias y Bloques de Clase
-                    </h3>
-                    <Button variant="outline" size="xs" onClick={addSubjectRow} className="gap-1 cursor-pointer">
-                      <Plus className="size-3" />
-                      Agregar Materia
-                    </Button>
-                  </div>
-
-                  {schedSubjects.map((sub, sIdx) => (
-                    <div key={sIdx} className="p-3 border border-border bg-muted/10 rounded-xl space-y-3">
-                      <div className="flex flex-wrap items-end gap-3">
-                        <div className="flex-1 min-w-[200px] flex flex-col gap-1">
-                          <Label>Materia Base</Label>
-                          <Select
-                            value={sub.courseId}
-                            onChange={(e) => updateSubjectRow(sIdx, "courseId", e.target.value)}
-                          >
-                            <option value="">-- Selecciona --</option>
-                            {filteredCourses.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                          </Select>
-                        </div>
-
-                        <div className="flex-1 min-w-[180px] flex flex-col gap-1">
-                          <Label>Profesor</Label>
-                          <Select
-                            value={sub.teacherId}
-                            onChange={(e) => updateSubjectRow(sIdx, "teacherId", e.target.value)}
-                          >
-                            <option value="">Sin Profesor</option>
-                            {teachers.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-                          </Select>
-                        </div>
-
-                        <Button 
-                          variant="ghost" 
-                          size="icon-xs" 
-                          onClick={() => removeSubjectRow(sIdx)}
-                          className="text-destructive hover:bg-destructive/10 shrink-0 cursor-pointer"
-                          disabled={schedSubjects.length === 1}
-                        >
-                          <Trash2 className="size-3.5" />
-                        </Button>
-                      </div>
-
-                      {/* Slots for this Subject */}
-                      <div className="pl-6 border-l-2 border-primary/20 space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-bold text-muted-foreground uppercase">Horas del Bloque</span>
-                          <Button variant="ghost" size="xs" onClick={() => addSlotRow(sIdx)} className="text-[10px] h-7 px-2 cursor-pointer">
-                            + Agregar Bloque de Hora
-                          </Button>
-                        </div>
-
-                        {sub.slots.map((slot: any, slIdx: number) => (
-                          <div key={slIdx} className="flex flex-wrap items-center gap-2">
+                    {schedSubjects.map((sub, sIdx) => (
+                      <div key={sIdx} className="p-4 border border-border/60 bg-muted/10 rounded-xl space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="flex flex-col gap-1">
+                            <Label>Materia Base</Label>
                             <Select
-                              value={slot.dayOfWeek}
-                              onChange={(e) => updateSlotRow(sIdx, slIdx, "dayOfWeek", parseInt(e.target.value))}
-                              className="w-[110px]"
+                              value={sub.courseId}
+                              onChange={(e) => updateSubjectRow(sIdx, "courseId", e.target.value)}
                             >
-                              <option value={1}>Lunes</option>
-                              <option value={2}>Martes</option>
-                              <option value={3}>Miércoles</option>
-                              <option value={4}>Jueves</option>
-                              <option value={5}>Viernes</option>
+                              <option value="">-- Selecciona Materia --</option>
+                              {filteredCourses.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                             </Select>
+                          </div>
 
-                            <Input
-                              type="time"
-                              value={slot.startTime}
-                              onChange={(e) => updateSlotRow(sIdx, slIdx, "startTime", e.target.value)}
-                              className="w-[90px] h-8 text-[11px]"
-                            />
+                          <div className="flex items-end gap-2">
+                            <div className="flex-1 flex flex-col gap-1">
+                              <Label>Profesor</Label>
+                              <Select
+                                value={sub.teacherId}
+                                onChange={(e) => updateSubjectRow(sIdx, "teacherId", e.target.value)}
+                              >
+                                <option value="">Sin Profesor</option>
+                                {teachers.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                              </Select>
+                            </div>
 
-                            <span className="text-muted-foreground text-[10px]">a</span>
-
-                            <Input
-                              type="time"
-                              value={slot.endTime}
-                              onChange={(e) => updateSlotRow(sIdx, slIdx, "endTime", e.target.value)}
-                              className="w-[90px] h-8 text-[11px]"
-                            />
-
-                            <Select
-                              value={slot.roomId}
-                              onChange={(e) => updateSlotRow(sIdx, slIdx, "roomId", e.target.value)}
-                              className="flex-1 min-w-[120px]"
-                            >
-                              <option value="">Sin Aula</option>
-                              {rooms.map(r => <option key={r.id} value={r.id}>{r.name} ({r.capacity} cap)</option>)}
-                            </Select>
-
-                            <Button
-                              variant="ghost"
-                              size="icon-xs"
-                              onClick={() => removeSlotRow(sIdx, slIdx)}
+                            <Button 
+                              variant="ghost" 
+                              size="icon-sm" 
+                              onClick={() => removeSubjectRow(sIdx)}
                               className="text-destructive hover:bg-destructive/10 cursor-pointer"
-                              disabled={sub.slots.length === 1}
+                              disabled={schedSubjects.length === 1}
                             >
-                              <Trash2 className="size-3" />
+                              <Trash2 className="size-4" />
                             </Button>
                           </div>
-                        ))}
+                        </div>
+
+                        {/* Slots for this Subject */}
+                        <div className="pl-4 border-l-2 border-primary/20 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">Horarios de Clase</span>
+                            <Button variant="ghost" size="xs" onClick={() => addSlotRow(sIdx)} className="text-[10px] h-7 px-2 cursor-pointer">
+                              + Agregar Bloque de Hora
+                            </Button>
+                          </div>
+
+                          {sub.slots.map((slot: any, slIdx: number) => (
+                            <div key={slIdx} className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
+                              <div className="sm:col-span-3">
+                                <Select
+                                  value={slot.dayOfWeek}
+                                  onChange={(e) => updateSlotRow(sIdx, slIdx, "dayOfWeek", parseInt(e.target.value))}
+                                >
+                                  <option value={1}>Lunes</option>
+                                  <option value={2}>Martes</option>
+                                  <option value={3}>Miércoles</option>
+                                  <option value={4}>Jueves</option>
+                                  <option value={5}>Viernes</option>
+                                </Select>
+                              </div>
+
+                              <div className="sm:col-span-2">
+                                <Input
+                                  type="time"
+                                  value={slot.startTime}
+                                  onChange={(e) => updateSlotRow(sIdx, slIdx, "startTime", e.target.value)}
+                                  className="h-8 text-[11px]"
+                                />
+                              </div>
+
+                              <span className="sm:col-span-1 text-center text-muted-foreground text-[10px]">a</span>
+
+                              <div className="sm:col-span-2">
+                                <Input
+                                  type="time"
+                                  value={slot.endTime}
+                                  onChange={(e) => updateSlotRow(sIdx, slIdx, "endTime", e.target.value)}
+                                  className="h-8 text-[11px]"
+                                />
+                              </div>
+
+                              <div className="sm:col-span-3">
+                                <Select
+                                  value={slot.roomId}
+                                  onChange={(e) => updateSlotRow(sIdx, slIdx, "roomId", e.target.value)}
+                                >
+                                  <option value="">Sin Aula</option>
+                                  {rooms.map(r => <option key={r.id} value={r.id}>{r.name} ({r.capacity} cap)</option>)}
+                                </Select>
+                              </div>
+
+                              <div className="sm:col-span-1 flex justify-end">
+                                <Button
+                                  variant="ghost"
+                                  size="icon-xs"
+                                  onClick={() => removeSlotRow(sIdx, slIdx)}
+                                  className="text-destructive hover:bg-destructive/10 cursor-pointer"
+                                  disabled={sub.slots.length === 1}
+                                >
+                                  <Trash2 className="size-3" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
+                    ))}
+
+                    <div className="pt-4 border-t border-border flex justify-end">
+                      <Button 
+                        onClick={handleSaveGlobalSchedule} 
+                        className="px-6 cursor-pointer"
+                        disabled={loading}
+                      >
+                        {loading ? <Loader2 className="size-4 animate-spin mr-2" /> : <Save className="size-4 mr-2" />}
+                        <span>Publicar Horario</span>
+                      </Button>
                     </div>
-                  ))}
-
-                  <div className="pt-4 border-t border-border flex justify-end">
-                    <Button 
-                      onClick={handleSaveGlobalSchedule} 
-                      className="px-6 cursor-pointer"
-                      disabled={loading}
-                    >
-                      {loading ? <Loader2 className="size-4 animate-spin" /> : "Guardar y Publicar Horario"}
-                    </Button>
                   </div>
-                </div>
 
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+
+              {/* LIST OF LOADED GLOBAL SCHEDULES */}
+              <AdminCrudTable
+                title="Horarios Globales Cargados"
+                description="Listado de horarios configurados para cada sección y lapso académico."
+                items={globalSchedules}
+                fields={[
+                  { 
+                    label: "Lapso", 
+                    key: "term", 
+                    render: (item: any) => item.term?.name || "N/A" 
+                  },
+                  { 
+                    label: "Sección", 
+                    key: "section", 
+                    render: (item: any) => item.section?.name || "N/A" 
+                  },
+                  { 
+                    label: "Semestre", 
+                    key: "semester", 
+                    render: (item: any) => `${item.semester} Semestre` 
+                  },
+                  { 
+                    label: "Materias Ofertadas", 
+                    key: "subjects",
+                    render: (item: any) => (
+                      <span className="font-mono bg-muted/50 border border-border px-1.5 py-0.5 rounded-sm">
+                        {item.subjects?.length || 0} materias
+                      </span>
+                    )
+                  }
+                ]}
+                onDelete={handleDeleteGlobalSchedule}
+              />
+            </div>
           )}
 
           {/* TAB: DECANATOS */}
@@ -714,6 +775,28 @@ export default function AdminPage() {
                   <Button type="submit" className="w-full cursor-pointer mt-3">Guardar Decanato</Button>
                 </form>
               )}
+              renderEditForm={(item, close) => {
+                const [editName, setEditName] = React.useState(item.name)
+                return (
+                  <form onSubmit={async (e) => {
+                    e.preventDefault()
+                    await updateDeanery(item.id, { name: editName })
+                    toast.success("Decanato actualizado exitosamente")
+                    fetchData()
+                    close()
+                  }} className="space-y-4 font-sans">
+                    <div className="flex flex-col gap-1.5">
+                      <Label>Nombre Completo del Decanato</Label>
+                      <Input
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <Button type="submit" className="w-full cursor-pointer mt-3">Guardar Cambios</Button>
+                  </form>
+                )
+              }}
             />
           )}
 
@@ -757,6 +840,38 @@ export default function AdminPage() {
                   <Button type="submit" className="w-full cursor-pointer mt-3">Guardar Carrera</Button>
                 </form>
               )}
+              renderEditForm={(item, close) => {
+                const [editName, setEditName] = React.useState(item.name)
+                const [editDec, setEditDec] = React.useState(item.deaneryId || "")
+                return (
+                  <form onSubmit={async (e) => {
+                    e.preventDefault()
+                    await updateCareer(item.id, { name: editName, deaneryId: editDec })
+                    toast.success("Carrera actualizada exitosamente")
+                    fetchData()
+                    close()
+                  }} className="space-y-4 font-sans">
+                    <div className="flex flex-col gap-1.5">
+                      <Label>Nombre de la Carrera</Label>
+                      <Input
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <Label>Decanato</Label>
+                      <Select
+                        value={editDec}
+                        onChange={(e) => setEditDec(e.target.value)}
+                      >
+                        {deaneries.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+                      </Select>
+                    </div>
+                    <Button type="submit" className="w-full cursor-pointer mt-3">Guardar Cambios</Button>
+                  </form>
+                )
+              }}
             />
           )}
 
@@ -803,6 +918,38 @@ export default function AdminPage() {
                   <Button type="submit" className="w-full cursor-pointer mt-3">Publicar Comunicado</Button>
                 </form>
               )}
+              renderEditForm={(item, close) => {
+                const [editTitle, setEditTitle] = React.useState(item.title)
+                const [editContent, setEditContent] = React.useState(item.content)
+                return (
+                  <form onSubmit={async (e) => {
+                    e.preventDefault()
+                    await updateNotice(item.id, { title: editTitle, content: editContent })
+                    toast.success("Aviso actualizado exitosamente")
+                    fetchData()
+                    close()
+                  }} className="space-y-4 font-sans">
+                    <div className="flex flex-col gap-1.5">
+                      <Label>Título del Aviso</Label>
+                      <Input
+                        value={editTitle}
+                        onChange={(e) => setEditTitle(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <Label>Contenido / Detalles</Label>
+                      <textarea
+                        value={editContent}
+                        onChange={(e) => setEditContent(e.target.value)}
+                        className="flex min-h-24 w-full border border-input bg-transparent px-3 py-2 text-xs ring-offset-background placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-lg outline-none"
+                        required
+                      />
+                    </div>
+                    <Button type="submit" className="w-full cursor-pointer mt-3">Guardar Cambios</Button>
+                  </form>
+                )
+              }}
             />
           )}
 
@@ -864,6 +1011,50 @@ export default function AdminPage() {
                   <Button type="submit" className="w-full cursor-pointer mt-3">Guardar Materia</Button>
                 </form>
               )}
+              renderEditForm={(item, close) => {
+                const [editName, setEditName] = React.useState(item.name)
+                const [editSem, setEditSem] = React.useState(item.semester ? item.semester.toString() : "1")
+                const [editCar, setEditCar] = React.useState(item.careerId || "")
+                return (
+                  <form onSubmit={async (e) => {
+                    e.preventDefault()
+                    await updateCourse(item.id, { name: editName, semester: editSem, careerId: editCar })
+                    toast.success("Materia actualizada exitosamente")
+                    fetchData()
+                    close()
+                  }} className="space-y-4 font-sans">
+                    <div className="flex flex-col gap-1.5">
+                      <Label>Nombre de Materia</Label>
+                      <Input
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <Label>Semestre</Label>
+                      <Select
+                        value={editSem}
+                        onChange={(e) => setEditSem(e.target.value)}
+                      >
+                        {Array.from({ length: 10 }, (_, i) => i + 1).map(s => (
+                          <option key={s} value={s.toString()}>Semestre {s}</option>
+                        ))}
+                      </Select>
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <Label>Carrera</Label>
+                      <Select
+                        value={editCar}
+                        onChange={(e) => setEditCar(e.target.value)}
+                      >
+                        {careers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                      </Select>
+                    </div>
+                    <Button type="submit" className="w-full cursor-pointer mt-3">Guardar Cambios</Button>
+                  </form>
+                )
+              }}
             />
           )}
 
@@ -893,6 +1084,28 @@ export default function AdminPage() {
                   <Button type="submit" className="w-full cursor-pointer mt-3">Registrar Profesor</Button>
                 </form>
               )}
+              renderEditForm={(item, close) => {
+                const [editName, setEditName] = React.useState(item.name)
+                return (
+                  <form onSubmit={async (e) => {
+                    e.preventDefault()
+                    await updateTeacher(item.id, { name: editName })
+                    toast.success("Profesor actualizado exitosamente")
+                    fetchData()
+                    close()
+                  }} className="space-y-4 font-sans">
+                    <div className="flex flex-col gap-1.5">
+                      <Label>Nombre Completo del Profesor</Label>
+                      <Input
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <Button type="submit" className="w-full cursor-pointer mt-3">Guardar Cambios</Button>
+                  </form>
+                )
+              }}
             />
           )}
 
@@ -922,6 +1135,28 @@ export default function AdminPage() {
                   <Button type="submit" className="w-full cursor-pointer mt-3">Guardar Sección</Button>
                 </form>
               )}
+              renderEditForm={(item, close) => {
+                const [editName, setEditName] = React.useState(item.name)
+                return (
+                  <form onSubmit={async (e) => {
+                    e.preventDefault()
+                    await updateSection(item.id, { name: editName })
+                    toast.success("Sección actualizada exitosamente")
+                    fetchData()
+                    close()
+                  }} className="space-y-4 font-sans">
+                    <div className="flex flex-col gap-1.5">
+                      <Label>Identificador de la Sección</Label>
+                      <Input
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <Button type="submit" className="w-full cursor-pointer mt-3">Guardar Cambios</Button>
+                  </form>
+                )
+              }}
             />
           )}
 
@@ -966,6 +1201,37 @@ export default function AdminPage() {
                   <Button type="submit" className="w-full cursor-pointer mt-3">Guardar Aula</Button>
                 </form>
               )}
+              renderEditForm={(item, close) => {
+                const [editName, setEditName] = React.useState(item.name)
+                const [editCap, setEditCap] = React.useState(item.capacity ? item.capacity.toString() : "")
+                return (
+                  <form onSubmit={async (e) => {
+                    e.preventDefault()
+                    await updateRoom(item.id, { name: editName, capacity: editCap })
+                    toast.success("Aula actualizada exitosamente")
+                    fetchData()
+                    close()
+                  }} className="space-y-4 font-sans">
+                    <div className="flex flex-col gap-1.5">
+                      <Label>Nombre / Nro de Aula</Label>
+                      <Input
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <Label>Capacidad de Aforo (Puestos)</Label>
+                      <Input
+                        type="number"
+                        value={editCap}
+                        onChange={(e) => setEditCap(e.target.value)}
+                      />
+                    </div>
+                    <Button type="submit" className="w-full cursor-pointer mt-3">Guardar Cambios</Button>
+                  </form>
+                )
+              }}
             />
           )}
 
