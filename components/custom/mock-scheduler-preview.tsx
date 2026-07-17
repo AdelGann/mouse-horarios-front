@@ -41,16 +41,16 @@ interface Subject {
 }
 
 const TIME_BLOCKS = [
-  { label: "08:00 - 08:45", index: 0 },
-  { label: "08:45 - 09:30", index: 1 },
-  { label: "09:30 - 10:15", index: 2 },
-  { label: "10:25 - 11:10", index: 3 },
-  { label: "11:10 - 11:55", index: 4 },
-  { label: "11:55 - 12:40", index: 5 },
-  { label: "12:50 - 13:35", index: 6 },
-  { label: "13:35 - 14:20", index: 7 },
-  { label: "14:20 - 15:05", index: 8 },
-  { label: "15:15 - 16:00", index: 9 },
+  { label: "08:00 - 08:45", index: 0, startTime: "08:00", endTime: "08:45" },
+  { label: "08:45 - 09:30", index: 1, startTime: "08:45", endTime: "09:30" },
+  { label: "09:30 - 10:15", index: 2, startTime: "09:30", endTime: "10:15" },
+  { label: "10:25 - 11:10", index: 3, startTime: "10:25", endTime: "11:10" },
+  { label: "11:10 - 11:55", index: 4, startTime: "11:10", endTime: "11:55" },
+  { label: "11:55 - 12:40", index: 5, startTime: "11:55", endTime: "12:40" },
+  { label: "12:50 - 13:35", index: 6, startTime: "12:50", endTime: "13:35" },
+  { label: "13:35 - 14:20", index: 7, startTime: "13:35", endTime: "14:20" },
+  { label: "14:20 - 15:05", index: 8, startTime: "14:20", endTime: "15:05" },
+  { label: "15:15 - 16:00", index: 9, startTime: "15:15", endTime: "16:00" },
 ]
 
 const DAYS = [
