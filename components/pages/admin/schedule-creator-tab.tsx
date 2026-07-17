@@ -54,9 +54,9 @@ export function ScheduleCreatorTab({
     if (sections.length > 0 && !schedSectionId) setSchedSectionId(sections[0].id)
     if (careers.length > 0 && !schedCareerId) setSchedCareerId(careers[0].id)
     if (rooms.length > 0) {
-      setSchedSubjects(prev => prev.map(s => ({
+      setSchedSubjects(prev => prev.map((s: any) => ({
         ...s,
-        slots: s.slots.map(sl => ({ ...sl, roomId: sl.roomId || rooms[0].id }))
+        slots: s.slots.map((sl: any) => ({ ...sl, roomId: sl.roomId || rooms[0].id }))
       })))
     }
   }, [terms, sections, careers, rooms])
