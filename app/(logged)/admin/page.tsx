@@ -74,6 +74,11 @@ function GlobalScheduleEditForm({
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
+    const invalid = editSubjects.some(s => !s.courseId || s.slots.some((sl: any) => !sl.startTime || !sl.endTime || !sl.roomId))
+    if (invalid) {
+      toast.error("Por favor selecciona un salón para cada bloque de hora.")
+      return
+    }
     setSaving(true)
     try {
       await onSave({
@@ -104,12 +109,14 @@ function GlobalScheduleEditForm({
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="gs-term">Lapso Académico</Label>
           <Select id="gs-term" value={editTermId} onChange={e => setEditTermId(e.target.value)}>
+            <option value="">-- Selecciona Lapso --</option>
             {terms.map((t: any) => <option key={t.id} value={t.id}>{t.name}</option>)}
           </Select>
         </div>
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="gs-sec">Sección</Label>
           <Select id="gs-sec" value={editSectionId} onChange={e => setEditSectionId(e.target.value)}>
+            <option value="">-- Selecciona Sección --</option>
             {sections.map((s: any) => <option key={s.id} value={s.id}>{s.name}</option>)}
           </Select>
         </div>
@@ -304,6 +311,12 @@ export default function AdminPage() {
 
       const rms = await getRooms()
       setRooms(rms)
+      if (rms.length > 0) {
+        setSchedSubjects(prev => prev.map(s => ({
+          ...s,
+          slots: s.slots.map(sl => ({ ...sl, roomId: sl.roomId || rms[0].id }))
+        })))
+      }
 
       const tms = await getTerms()
       setTerms(tms)
@@ -512,7 +525,7 @@ export default function AdminPage() {
   const addSubjectRow = () => {
     setSchedSubjects(prev => [
       ...prev,
-      { courseId: "", teacherId: "", slots: [{ dayOfWeek: 1, startTime: "08:00", endTime: "08:45", roomId: "" }] }
+      { courseId: "", teacherId: "", slots: [{ dayOfWeek: 1, startTime: "08:00", endTime: "08:45", roomId: rooms[0]?.id || "" }] }
     ])
   }
 
@@ -529,7 +542,7 @@ export default function AdminPage() {
       if (i === subIdx) {
         return {
           ...item,
-          slots: [...item.slots, { dayOfWeek: 1, startTime: "08:00", endTime: "08:45", roomId: "" }]
+          slots: [...item.slots, { dayOfWeek: 1, startTime: "08:00", endTime: "08:45", roomId: rooms[0]?.id || "" }]
         }
       }
       return item
@@ -561,9 +574,9 @@ export default function AdminPage() {
   }
 
   const handleSaveGlobalSchedule = async () => {
-    const invalid = schedSubjects.some(s => !s.courseId || s.slots.some((sl: any) => !sl.startTime || !sl.endTime))
+    const invalid = schedSubjects.some(s => !s.courseId || s.slots.some((sl: any) => !sl.startTime || !sl.endTime || !sl.roomId))
     if (invalid || !schedTermId || !schedSectionId) {
-      toast.error("Por favor completa las materias y las horas de clases")
+      toast.error("Por favor completa todos los campos (materia, hora de inicio/fin y salón) para cada bloque.")
       return
     }
 
@@ -577,7 +590,7 @@ export default function AdminPage() {
       })
       toast.success("Horario global guardado con éxito")
       setSchedSubjects([
-        { courseId: "", teacherId: "", slots: [{ dayOfWeek: 1, startTime: "08:00", endTime: "08:45", roomId: "" }] }
+        { courseId: "", teacherId: "", slots: [{ dayOfWeek: 1, startTime: "08:00", endTime: "08:45", roomId: rooms[0]?.id || "" }] }
       ])
       fetchData()
     } catch (e: any) {
@@ -736,10 +749,11 @@ export default function AdminPage() {
                         value={schedTermId}
                         onChange={(e) => setSchedTermId(e.target.value)}
                       >
+                        <option value="">-- Selecciona Lapso --</option>
                         {terms.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                       </Select>
                     </div>
-
+ 
                     <div className="flex flex-col gap-1">
                       <Label htmlFor="schedCareer">Carrera</Label>
                       <Select
@@ -750,7 +764,7 @@ export default function AdminPage() {
                         {careers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                       </Select>
                     </div>
-
+ 
                     <div className="flex flex-col gap-1">
                       <Label htmlFor="schedSem">Semestre</Label>
                       <Select
@@ -763,7 +777,7 @@ export default function AdminPage() {
                         ))}
                       </Select>
                     </div>
-
+ 
                     <div className="flex flex-col gap-1">
                       <Label htmlFor="schedSec">Sección</Label>
                       <Select
@@ -771,6 +785,7 @@ export default function AdminPage() {
                         value={schedSectionId}
                         onChange={(e) => setSchedSectionId(e.target.value)}
                       >
+                        <option value="">-- Selecciona Sección --</option>
                         {sections.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                       </Select>
                     </div>

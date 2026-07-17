@@ -79,11 +79,12 @@ export function MockSchedulerPreview({ initialDraftId }: MockSchedulerPreviewPro
   const [user, setUser] = React.useState<any>(null)
   
   // Custom hooks
-  const { getCareers } = useAcademic()
+  const { getCareers, getSections } = useAcademic()
   const { getSectionsSchedules, getPersonalSchedules, savePersonalSchedule } = useSchedules()
 
   // Selection/Search filters
   const [careers, setCareers] = React.useState<any[]>([])
+  const [sections, setSections] = React.useState<any[]>([])
   const [selectedCareer, setSelectedCareer] = React.useState("")
   const [selectedSemester, setSelectedSemester] = React.useState<number>(1)
   const [selectedSection, setSelectedSection] = React.useState<string>("All")
@@ -135,7 +136,12 @@ export function MockSchedulerPreview({ initialDraftId }: MockSchedulerPreviewPro
         if (res.length > 0) setSelectedCareer(res[0].id)
       })
       .catch(console.error)
-  }, [])
+
+    // Fetch Sections
+    getSections()
+      .then(res => setSections(res))
+      .catch(console.error)
+  }, [getCareers, getSections])
 
   // Load section-based schedules
   const fetchSchedules = React.useCallback(async () => {
@@ -547,9 +553,9 @@ export function MockSchedulerPreview({ initialDraftId }: MockSchedulerPreviewPro
                 onChange={(e) => setSelectedSection(e.target.value)}
               >
                 <option value="All">Todas</option>
-                <option value="Sección 1">Sección 1</option>
-                <option value="Sección 2">Sección 2</option>
-                <option value="Sección 3">Sección 3</option>
+                {sections.map(s => (
+                  <option key={s.id} value={s.name}>{s.name}</option>
+                ))}
               </Select>
             </div>
           </div>
