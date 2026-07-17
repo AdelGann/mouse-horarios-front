@@ -40,13 +40,14 @@ interface Subject {
 const TIME_BLOCKS = [
   { label: "08:00 - 08:45", index: 0 },
   { label: "08:45 - 09:30", index: 1 },
-  { label: "09:45 - 10:30", index: 2 },
-  { label: "10:30 - 11:15", index: 3 },
-  { label: "11:30 - 12:15", index: 4 },
-  { label: "12:15 - 13:00", index: 5 },
-  { label: "13:15 - 14:00", index: 6 },
-  { label: "14:00 - 14:45", index: 7 },
-  { label: "15:00 - 15:45", index: 8 },
+  { label: "09:30 - 10:15", index: 2 },
+  { label: "10:25 - 11:10", index: 3 },
+  { label: "11:10 - 11:55", index: 4 },
+  { label: "11:55 - 12:40", index: 5 },
+  { label: "12:50 - 13:35", index: 6 },
+  { label: "13:35 - 14:20", index: 7 },
+  { label: "14:20 - 15:05", index: 8 },
+  { label: "15:15 - 16:00", index: 9 },
 ]
 
 const DAYS = [
@@ -99,7 +100,7 @@ export function MockSchedulerPreview({ initialDraftId }: MockSchedulerPreviewPro
   const [loading, setLoading] = React.useState(false)
   const [saving, setSaving] = React.useState(false)
 
-  // Map Time Block index from HH:MM string to 9 blocks of 45 mins starting at 08:00 AM
+  // Map Time Block index from HH:MM string to 10 blocks starting at 08:00 AM
   const getBlockIndex = (startTime: string) => {
     if (!startTime) return 0
     const [hh, mm] = startTime.split(":").map(Number)
@@ -107,13 +108,14 @@ export function MockSchedulerPreview({ initialDraftId }: MockSchedulerPreviewPro
 
     if (minutes < 8 * 60 + 45) return 0      // 08:00 - 08:45
     if (minutes < 9 * 60 + 30) return 1      // 08:45 - 09:30
-    if (minutes < 10 * 60 + 30) return 2     // 09:45 - 10:30
-    if (minutes < 11 * 60 + 15) return 3     // 10:30 - 11:15
-    if (minutes < 12 * 60 + 15) return 4     // 11:30 - 12:15
-    if (minutes < 13 * 60 + 0) return 5      // 12:15 - 13:00
-    if (minutes < 14 * 60 + 0) return 6      // 13:15 - 14:00
-    if (minutes < 14 * 60 + 45) return 7     // 14:00 - 14:45
-    return 8                                 // 15:00 - 15:45
+    if (minutes < 10 * 60 + 15) return 2     // 09:30 - 10:15
+    if (minutes < 11 * 60 + 10) return 3     // 10:25 - 11:10
+    if (minutes < 11 * 60 + 55) return 4     // 11:10 - 11:55
+    if (minutes < 12 * 60 + 40) return 5     // 11:55 - 12:40
+    if (minutes < 13 * 60 + 35) return 6     // 12:50 - 13:35
+    if (minutes < 14 * 60 + 20) return 7     // 13:35 - 14:20
+    if (minutes < 15 * 60 + 5) return 8      // 14:20 - 15:05
+    return 9                                 // 15:15 - 16:00
   }
 
   // Load user session and careers list
