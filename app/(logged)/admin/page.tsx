@@ -28,6 +28,15 @@ import { useSchedules } from "@/lib/hooks/useSchedules"
 import { useNotices } from "@/lib/hooks/useNotices"
 import { AdminCrudTable } from "@/components/custom/admin-crud-table"
 import { toast } from "react-hot-toast"
+import { 
+  AddDeaneryForm, EditDeaneryForm,
+  AddCareerForm, EditCareerForm,
+  AddNoticeForm, EditNoticeForm,
+  AddCourseForm, EditCourseForm,
+  AddTeacherForm, EditTeacherForm,
+  AddSectionForm, EditSectionForm,
+  AddRoomForm, EditRoomForm 
+} from "@/components/custom/admin-forms"
 
 // ─── GlobalScheduleEditForm ───────────────────────────────────────────────────
 // Extracted as a proper component so hooks are called at the top level (React rules of hooks)
@@ -1004,42 +1013,26 @@ export default function AdminPage() {
               ]}
               addLabel="Crear Decanato"
               renderAddForm={(close) => (
-                <form onSubmit={async (e) => { e.preventDefault(); await handleAddDeanery(e); close(); }} className="space-y-4 font-sans">
-                  <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="decName">Nombre Completo del Decanato</Label>
-                    <Input
-                      id="decName"
-                      placeholder="ej: Decanato de Ciencias y Tecnología"
-                      value={newDeanery}
-                      onChange={(e) => setNewDeanery(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <Button type="submit" className="w-full cursor-pointer mt-3">Guardar Decanato</Button>
-                </form>
+                <AddDeaneryForm
+                  onClose={close}
+                  onSave={async (name) => {
+                    await createDeanery({ name })
+                    toast.success("Decanato creado exitosamente")
+                    fetchData()
+                  }}
+                />
               )}
-              renderEditForm={(item, close) => {
-                const [editName, setEditName] = React.useState(item.name)
-                return (
-                  <form onSubmit={async (e) => {
-                    e.preventDefault()
-                    await updateDeanery(item.id, { name: editName })
+              renderEditForm={(item, close) => (
+                <EditDeaneryForm
+                  item={item}
+                  onClose={close}
+                  onSave={async (id, name) => {
+                    await updateDeanery(id, { name })
                     toast.success("Decanato actualizado exitosamente")
                     fetchData()
-                    close()
-                  }} className="space-y-4 font-sans">
-                    <div className="flex flex-col gap-1.5">
-                      <Label>Nombre Completo del Decanato</Label>
-                      <Input
-                        value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <Button type="submit" className="w-full cursor-pointer mt-3">Guardar Cambios</Button>
-                  </form>
-                )
-              }}
+                  }}
+                />
+              )}
             />
           )}
 
@@ -1059,62 +1052,28 @@ export default function AdminPage() {
               ]}
               addLabel="Crear Carrera"
               renderAddForm={(close) => (
-                <form onSubmit={async (e) => { e.preventDefault(); await handleAddCareer(e); close(); }} className="space-y-4 font-sans">
-                  <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="carName">Nombre de la Carrera</Label>
-                    <Input
-                      id="carName"
-                      placeholder="ej: Ingeniería Informática"
-                      value={newCareer.name}
-                      onChange={(e) => setNewCareer(prev => ({ ...prev, name: e.target.value }))}
-                      required
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="carDec">Pertenece al Decanato</Label>
-                    <Select
-                      id="carDec"
-                      value={newCareer.deaneryId}
-                      onChange={(e) => setNewCareer(prev => ({ ...prev, deaneryId: e.target.value }))}
-                    >
-                      {deaneries.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-                    </Select>
-                  </div>
-                  <Button type="submit" className="w-full cursor-pointer mt-3">Guardar Carrera</Button>
-                </form>
+                <AddCareerForm
+                  deaneries={deaneries}
+                  onClose={close}
+                  onSave={async (values) => {
+                    await createCareer(values)
+                    toast.success("Carrera creada exitosamente")
+                    fetchData()
+                  }}
+                />
               )}
-              renderEditForm={(item, close) => {
-                const [editName, setEditName] = React.useState(item.name)
-                const [editDec, setEditDec] = React.useState(item.deaneryId || "")
-                return (
-                  <form onSubmit={async (e) => {
-                    e.preventDefault()
-                    await updateCareer(item.id, { name: editName, deaneryId: editDec })
+              renderEditForm={(item, close) => (
+                <EditCareerForm
+                  item={item}
+                  deaneries={deaneries}
+                  onClose={close}
+                  onSave={async (id, values) => {
+                    await updateCareer(id, values)
                     toast.success("Carrera actualizada exitosamente")
                     fetchData()
-                    close()
-                  }} className="space-y-4 font-sans">
-                    <div className="flex flex-col gap-1.5">
-                      <Label>Nombre de la Carrera</Label>
-                      <Input
-                        value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <Label>Decanato</Label>
-                      <Select
-                        value={editDec}
-                        onChange={(e) => setEditDec(e.target.value)}
-                      >
-                        {deaneries.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-                      </Select>
-                    </div>
-                    <Button type="submit" className="w-full cursor-pointer mt-3">Guardar Cambios</Button>
-                  </form>
-                )
-              }}
+                  }}
+                />
+              )}
             />
           )}
 
@@ -1136,63 +1095,26 @@ export default function AdminPage() {
               onDelete={handleDeleteNotice}
               addLabel="Publicar Aviso"
               renderAddForm={(close) => (
-                <form onSubmit={async (e) => { e.preventDefault(); await handleAddNotice(e); close(); }} className="space-y-4 font-sans">
-                  <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="nTitle">Título del Aviso</Label>
-                    <Input
-                      id="nTitle"
-                      placeholder="ej: Inscripciones Lapso 2026-1"
-                      value={newNotice.title}
-                      onChange={(e) => setNewNotice(prev => ({ ...prev, title: e.target.value }))}
-                      required
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="nContent">Contenido / Detalles</Label>
-                    <textarea
-                      id="nContent"
-                      placeholder="Detalles sobre fechas, prioridades o carreras convocadas..."
-                      value={newNotice.content}
-                      onChange={(e) => setNewNotice(prev => ({ ...prev, content: e.target.value }))}
-                      className="flex min-h-24 w-full border border-input bg-transparent px-3 py-2 text-xs ring-offset-background placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-lg outline-none"
-                      required
-                    />
-                  </div>
-                  <Button type="submit" className="w-full cursor-pointer mt-3">Publicar Comunicado</Button>
-                </form>
+                <AddNoticeForm
+                  onClose={close}
+                  onSave={async (values) => {
+                    await createNotice(values)
+                    toast.success("Aviso publicado exitosamente")
+                    fetchData()
+                  }}
+                />
               )}
-              renderEditForm={(item, close) => {
-                const [editTitle, setEditTitle] = React.useState(item.title)
-                const [editContent, setEditContent] = React.useState(item.content)
-                return (
-                  <form onSubmit={async (e) => {
-                    e.preventDefault()
-                    await updateNotice(item.id, { title: editTitle, content: editContent })
+              renderEditForm={(item, close) => (
+                <EditNoticeForm
+                  item={item}
+                  onClose={close}
+                  onSave={async (id, values) => {
+                    await updateNotice(id, values)
                     toast.success("Aviso actualizado exitosamente")
                     fetchData()
-                    close()
-                  }} className="space-y-4 font-sans">
-                    <div className="flex flex-col gap-1.5">
-                      <Label>Título del Aviso</Label>
-                      <Input
-                        value={editTitle}
-                        onChange={(e) => setEditTitle(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <Label>Contenido / Detalles</Label>
-                      <textarea
-                        value={editContent}
-                        onChange={(e) => setEditContent(e.target.value)}
-                        className="flex min-h-24 w-full border border-input bg-transparent px-3 py-2 text-xs ring-offset-background placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-lg outline-none"
-                        required
-                      />
-                    </div>
-                    <Button type="submit" className="w-full cursor-pointer mt-3">Guardar Cambios</Button>
-                  </form>
-                )
-              }}
+                  }}
+                />
+              )}
             />
           )}
 
@@ -1218,86 +1140,28 @@ export default function AdminPage() {
               onDelete={handleDeleteCourse}
               addLabel="Crear Materia"
               renderAddForm={(close) => (
-                <form onSubmit={async (e) => { e.preventDefault(); await handleAddCourse(e); close(); }} className="space-y-4 font-sans">
-                  <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="mName">Nombre de Materia</Label>
-                    <Input
-                      id="mName"
-                      placeholder="ej: Algoritmos"
-                      value={newCourse.name}
-                      onChange={(e) => setNewCourse(prev => ({ ...prev, name: e.target.value }))}
-                      required
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="mSem">Semestre</Label>
-                    <Select
-                      id="mSem"
-                      value={newCourse.semester}
-                      onChange={(e) => setNewCourse(prev => ({ ...prev, semester: e.target.value }))}
-                    >
-                      {Array.from({ length: 10 }, (_, i) => i + 1).map(s => (
-                        <option key={s} value={s.toString()}>Semestre {s}</option>
-                      ))}
-                    </Select>
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="mCar">Carrera</Label>
-                    <Select
-                      id="mCar"
-                      value={newCourse.careerId}
-                      onChange={(e) => setNewCourse(prev => ({ ...prev, careerId: e.target.value }))}
-                    >
-                      {careers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                    </Select>
-                  </div>
-                  <Button type="submit" className="w-full cursor-pointer mt-3">Guardar Materia</Button>
-                </form>
+                <AddCourseForm
+                  careers={careers}
+                  onClose={close}
+                  onSave={async (values) => {
+                    await createCourse(values)
+                    toast.success("Materia creada exitosamente")
+                    fetchData()
+                  }}
+                />
               )}
-              renderEditForm={(item, close) => {
-                const [editName, setEditName] = React.useState(item.name)
-                const [editSem, setEditSem] = React.useState(item.semester ? item.semester.toString() : "1")
-                const [editCar, setEditCar] = React.useState(item.careerId || "")
-                return (
-                  <form onSubmit={async (e) => {
-                    e.preventDefault()
-                    await updateCourse(item.id, { name: editName, semester: editSem, careerId: editCar })
+              renderEditForm={(item, close) => (
+                <EditCourseForm
+                  item={item}
+                  careers={careers}
+                  onClose={close}
+                  onSave={async (id, values) => {
+                    await updateCourse(id, values)
                     toast.success("Materia actualizada exitosamente")
                     fetchData()
-                    close()
-                  }} className="space-y-4 font-sans">
-                    <div className="flex flex-col gap-1.5">
-                      <Label>Nombre de Materia</Label>
-                      <Input
-                        value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <Label>Semestre</Label>
-                      <Select
-                        value={editSem}
-                        onChange={(e) => setEditSem(e.target.value)}
-                      >
-                        {Array.from({ length: 10 }, (_, i) => i + 1).map(s => (
-                          <option key={s} value={s.toString()}>Semestre {s}</option>
-                        ))}
-                      </Select>
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <Label>Carrera</Label>
-                      <Select
-                        value={editCar}
-                        onChange={(e) => setEditCar(e.target.value)}
-                      >
-                        {careers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                      </Select>
-                    </div>
-                    <Button type="submit" className="w-full cursor-pointer mt-3">Guardar Cambios</Button>
-                  </form>
-                )
-              }}
+                  }}
+                />
+              )}
             />
           )}
 
@@ -1313,42 +1177,26 @@ export default function AdminPage() {
               onDelete={handleDeleteTeacher}
               addLabel="Registrar Profesor"
               renderAddForm={(close) => (
-                <form onSubmit={async (e) => { e.preventDefault(); await handleAddTeacher(e); close(); }} className="space-y-4 font-sans">
-                  <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="tName">Nombre Completo del Profesor</Label>
-                    <Input
-                      id="tName"
-                      placeholder="ej: Ing. Carlos Gómez"
-                      value={newTeacher}
-                      onChange={(e) => setNewTeacher(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <Button type="submit" className="w-full cursor-pointer mt-3">Registrar Profesor</Button>
-                </form>
+                <AddTeacherForm
+                  onClose={close}
+                  onSave={async (name) => {
+                    await createTeacher({ name })
+                    toast.success("Profesor registrado exitosamente")
+                    fetchData()
+                  }}
+                />
               )}
-              renderEditForm={(item, close) => {
-                const [editName, setEditName] = React.useState(item.name)
-                return (
-                  <form onSubmit={async (e) => {
-                    e.preventDefault()
-                    await updateTeacher(item.id, { name: editName })
+              renderEditForm={(item, close) => (
+                <EditTeacherForm
+                  item={item}
+                  onClose={close}
+                  onSave={async (id, name) => {
+                    await updateTeacher(id, { name })
                     toast.success("Profesor actualizado exitosamente")
                     fetchData()
-                    close()
-                  }} className="space-y-4 font-sans">
-                    <div className="flex flex-col gap-1.5">
-                      <Label>Nombre Completo del Profesor</Label>
-                      <Input
-                        value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <Button type="submit" className="w-full cursor-pointer mt-3">Guardar Cambios</Button>
-                  </form>
-                )
-              }}
+                  }}
+                />
+              )}
             />
           )}
 
@@ -1364,42 +1212,26 @@ export default function AdminPage() {
               onDelete={handleDeleteSection}
               addLabel="Crear Sección"
               renderAddForm={(close) => (
-                <form onSubmit={async (e) => { e.preventDefault(); await handleAddSection(e); close(); }} className="space-y-4 font-sans">
-                  <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="sName">Identificador de la Sección</Label>
-                    <Input
-                      id="sName"
-                      placeholder="ej: Sección 1"
-                      value={newSection}
-                      onChange={(e) => setNewSection(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <Button type="submit" className="w-full cursor-pointer mt-3">Guardar Sección</Button>
-                </form>
+                <AddSectionForm
+                  onClose={close}
+                  onSave={async (name) => {
+                    await createSection({ name })
+                    toast.success("Sección registrada exitosamente")
+                    fetchData()
+                  }}
+                />
               )}
-              renderEditForm={(item, close) => {
-                const [editName, setEditName] = React.useState(item.name)
-                return (
-                  <form onSubmit={async (e) => {
-                    e.preventDefault()
-                    await updateSection(item.id, { name: editName })
+              renderEditForm={(item, close) => (
+                <EditSectionForm
+                  item={item}
+                  onClose={close}
+                  onSave={async (id, name) => {
+                    await updateSection(id, { name })
                     toast.success("Sección actualizada exitosamente")
                     fetchData()
-                    close()
-                  }} className="space-y-4 font-sans">
-                    <div className="flex flex-col gap-1.5">
-                      <Label>Identificador de la Sección</Label>
-                      <Input
-                        value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <Button type="submit" className="w-full cursor-pointer mt-3">Guardar Cambios</Button>
-                  </form>
-                )
-              }}
+                  }}
+                />
+              )}
             />
           )}
 
@@ -1420,61 +1252,26 @@ export default function AdminPage() {
               onDelete={handleDeleteRoom}
               addLabel="Registrar Aula"
               renderAddForm={(close) => (
-                <form onSubmit={async (e) => { e.preventDefault(); await handleAddRoom(e); close(); }} className="space-y-4 font-sans">
-                  <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="rName">Nombre / Nro de Aula</Label>
-                    <Input
-                      id="rName"
-                      placeholder="ej: Aula 101 - Edif. A"
-                      value={newRoom.name}
-                      onChange={(e) => setNewRoom(prev => ({ ...prev, name: e.target.value }))}
-                      required
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="rCap">Capacidad de Aforo (Puestos)</Label>
-                    <Input
-                      id="rCap"
-                      type="number"
-                      placeholder="ej: 35"
-                      value={newRoom.capacity}
-                      onChange={(e) => setNewRoom(prev => ({ ...prev, capacity: e.target.value }))}
-                    />
-                  </div>
-                  <Button type="submit" className="w-full cursor-pointer mt-3">Guardar Aula</Button>
-                </form>
+                <AddRoomForm
+                  onClose={close}
+                  onSave={async (values) => {
+                    await createRoom(values)
+                    toast.success("Aula creada exitosamente")
+                    fetchData()
+                  }}
+                />
               )}
-              renderEditForm={(item, close) => {
-                const [editName, setEditName] = React.useState(item.name)
-                const [editCap, setEditCap] = React.useState(item.capacity ? item.capacity.toString() : "")
-                return (
-                  <form onSubmit={async (e) => {
-                    e.preventDefault()
-                    await updateRoom(item.id, { name: editName, capacity: editCap })
+              renderEditForm={(item, close) => (
+                <EditRoomForm
+                  item={item}
+                  onClose={close}
+                  onSave={async (id, values) => {
+                    await updateRoom(id, values)
                     toast.success("Aula actualizada exitosamente")
                     fetchData()
-                    close()
-                  }} className="space-y-4 font-sans">
-                    <div className="flex flex-col gap-1.5">
-                      <Label>Nombre / Nro de Aula</Label>
-                      <Input
-                        value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <Label>Capacidad de Aforo (Puestos)</Label>
-                      <Input
-                        type="number"
-                        value={editCap}
-                        onChange={(e) => setEditCap(e.target.value)}
-                      />
-                    </div>
-                    <Button type="submit" className="w-full cursor-pointer mt-3">Guardar Cambios</Button>
-                  </form>
-                )
-              }}
+                  }}
+                />
+              )}
             />
           )}
 
