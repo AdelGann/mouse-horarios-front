@@ -38,12 +38,20 @@ interface Subject {
 }
 
 const TIME_BLOCKS = [
-  { label: "07:00 - 08:30", index: 0 },
-  { label: "08:35 - 10:05", index: 1 },
-  { label: "10:10 - 11:40", index: 2 },
-  { label: "11:45 - 01:15", index: 3 },
-  { label: "01:20 - 02:50", index: 4 },
-  { label: "02:55 - 04:25", index: 5 },
+  { label: "07:00 - 07:45", index: 0 },
+  { label: "07:45 - 08:30", index: 1 },
+  { label: "08:45 - 09:30", index: 2 },
+  { label: "09:30 - 10:15", index: 3 },
+  { label: "10:30 - 11:15", index: 4 },
+  { label: "11:15 - 12:00", index: 5 },
+  { label: "12:15 - 13:00", index: 6 },
+  { label: "13:00 - 13:45", index: 7 },
+  { label: "14:00 - 14:45", index: 8 },
+  { label: "14:45 - 15:30", index: 9 },
+  { label: "15:45 - 16:30", index: 10 },
+  { label: "16:30 - 17:15", index: 11 },
+  { label: "17:30 - 18:15", index: 12 },
+  { label: "18:15 - 19:00", index: 13 },
 ]
 
 const DAYS = [
@@ -52,6 +60,7 @@ const DAYS = [
   { label: "Miércoles", value: 3 },
   { label: "Jueves", value: 4 },
   { label: "Viernes", value: 5 },
+  { label: "Sábado", value: 6 },
 ]
 
 const SUBJECT_COLORS = [
@@ -95,15 +104,26 @@ export function MockSchedulerPreview({ initialDraftId }: MockSchedulerPreviewPro
   const [loading, setLoading] = React.useState(false)
   const [saving, setSaving] = React.useState(false)
 
-  // Map Time Block index from HH:MM string
+  // Map Time Block index from HH:MM string to 14 blocks of 45 mins
   const getBlockIndex = (startTime: string) => {
-    if (startTime.startsWith("07:")) return 0
-    if (startTime.startsWith("08:") || startTime.startsWith("09:")) return 1
-    if (startTime.startsWith("10:")) return 2
-    if (startTime.startsWith("11:") || startTime.startsWith("12:")) return 3
-    if (startTime.startsWith("01:") || startTime.startsWith("13:")) return 4
-    if (startTime.startsWith("02:") || startTime.startsWith("14:")) return 5
-    return 0
+    if (!startTime) return 0
+    const [hh, mm] = startTime.split(":").map(Number)
+    const minutes = hh * 60 + mm
+
+    if (minutes < 7 * 60 + 45) return 0      // 07:00 - 07:45
+    if (minutes < 8 * 60 + 30) return 1      // 07:45 - 08:30
+    if (minutes < 9 * 60 + 30) return 2      // 08:45 - 09:30
+    if (minutes < 10 * 60 + 15) return 3     // 09:30 - 10:15
+    if (minutes < 11 * 60 + 15) return 4     // 10:30 - 11:15
+    if (minutes < 12 * 60 + 0) return 5      // 11:15 - 12:00
+    if (minutes < 13 * 60 + 0) return 6      // 12:15 - 13:00
+    if (minutes < 13 * 60 + 45) return 7     // 13:00 - 13:45
+    if (minutes < 14 * 60 + 45) return 8     // 14:00 - 14:45
+    if (minutes < 15 * 60 + 30) return 9     // 14:45 - 15:30
+    if (minutes < 16 * 60 + 30) return 10    // 15:45 - 16:30
+    if (minutes < 17 * 60 + 15) return 11    // 16:30 - 17:15
+    if (minutes < 18 * 60 + 15) return 12    // 17:30 - 18:15
+    return 13                                // 18:15 - 19:00
   }
 
   // Load user session and careers list

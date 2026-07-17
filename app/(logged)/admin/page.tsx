@@ -179,6 +179,7 @@ function GlobalScheduleEditForm({
                     <option value={3}>Miércoles</option>
                     <option value={4}>Jueves</option>
                     <option value={5}>Viernes</option>
+                    <option value={6}>Sábado</option>
                   </Select>
                 </div>
                 <div className="col-span-2">
@@ -845,6 +846,7 @@ export default function AdminPage() {
                                   <option value={3}>Miércoles</option>
                                   <option value={4}>Jueves</option>
                                   <option value={5}>Viernes</option>
+                                  <option value={6}>Sábado</option>
                                 </Select>
                               </div>
 

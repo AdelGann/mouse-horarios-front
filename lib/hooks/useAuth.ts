@@ -51,5 +51,14 @@ export function useAuth() {
     }
   }
 
-  return { login, register, getProfile, updateProfile, uploadPhoto, loading }
+  const changePassword = async (passwordData: any): Promise<any> => {
+    setLoading(true)
+    try {
+      return await api.put("users/change-password", passwordData)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return { login, register, getProfile, updateProfile, uploadPhoto, changePassword, loading }
 }
