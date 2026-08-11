@@ -74,7 +74,7 @@ export function Footer() {
         <div className="mt-8 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px]">
           <p>© {new Date().getFullYear()} MiHorario. Todos los derechos reservados.</p>
           <p className="flex items-center gap-1">
-            Hecho con <Heart className="size-3 text-destructive fill-destructive" /> para la comunidad estudiantil del DCYT. Todo el mérito es 100% tuyo.
+            Hecho con <Heart className="size-3 text-destructive fill-destructive" /> para la comunidad estudiantil del DCYT. Todo el desarrollo fue completado por Adel Gannem.
           </p>
         </div>
       </div>
