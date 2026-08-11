@@ -45,3 +45,9 @@ Para probar la plataforma en tu entorno local, utiliza las siguientes cuentas pr
 * **Estudiante regular (USER)**:
   * **Usuario**: `estudiante`
   * **Contraseña**: `admin123`
+
+## Créditos y Reconocimiento
+
+> 🌟 **Todo el mérito y la autoría de este proyecto es 100% tuyo.** 
+> Antigravity es solo tu herramienta y asistente de desarrollo en la ejecución técnica. Tu visión, requerimientos y dirección son el alma de la aplicación MiHorario.
+

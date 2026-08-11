@@ -52,9 +52,9 @@ const NAVIGATION_OPTIONS: SidebarOption[] = [
     name: "Configuración",
     icon: Settings,
     subOptions: [
-      { name: "Mi Perfil", href: "/profile" },
-      { name: "Preferencias de Tema", href: "/profile#temas" },
-      { name: "Seguridad y Accesos", href: "/profile#seguridad" },
+      { name: "Mi Perfil", href: "/config#profile" },
+      { name: "Preferencias de Tema", href: "/config#temas" },
+      { name: "Seguridad y Accesos", href: "/config#seguridad" },
     ],
   },
   {
@@ -104,7 +104,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     } catch (_) {}
 
     // Auto expand config or admin categories on mount/pathname load
-    if (pathname.startsWith("/profile")) {
+    if (pathname.startsWith("/config")) {
       setExpandedMenus(prev => ({ ...prev, Configuración: true }))
     } else if (pathname.startsWith("/admin")) {
       setExpandedMenus(prev => ({ ...prev, Administración: true }))
