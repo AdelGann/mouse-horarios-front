@@ -125,8 +125,9 @@ export function ProfileTab({
     }
   }
 
+  const apiHost = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
   const avatarUrl = user.img_url 
-    ? (user.img_url.startsWith("http") ? user.img_url : `http://localhost:3001${user.img_url}`)
+    ? (user.img_url.startsWith("http") ? user.img_url : `${apiHost}${user.img_url}`)
     : null
 
   return (
